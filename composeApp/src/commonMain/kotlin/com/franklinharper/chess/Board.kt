@@ -1,6 +1,9 @@
 package com.franklinharper.chess
 
 import com.franklinharper.chess.Piece.*
+import com.franklinharper.chess.Piece.Companion.blackKingInitialCoordinates
+import com.franklinharper.chess.Piece.Companion.whiteKingInitialCoordinates
+import com.franklinharper.chess.PieceColor.Black
 import com.franklinharper.chess.PieceColor.White
 import kotlin.math.abs
 
@@ -16,7 +19,51 @@ import kotlin.math.abs
 class Board private constructor(
     private val squareMap: Map<Coordinates, Square> = emptyMap(),
 ) {
-    constructor(squareSet: Set<Square>) : this(squareSet.associateBy { square -> square.coordinates })
+    constructor(squareSet: Set<Square>) :
+            this(squareSet.associateBy { square -> square.coordinates })
+
+    constructor() :
+            this(
+                setOf(
+                    // Black
+                    Square(piece = Rook(Black), coordinates = Coordinates(col = 0, row = 0)),
+                    Square(piece = Knight(Black), coordinates = Coordinates(col = 1, row = 0)),
+                    Square(piece = Bishop(Black), coordinates = Coordinates(col = 2, row = 0)),
+                    Square(piece = Queen(Black), coordinates = Coordinates(col = 3, row = 0)),
+                    Square(piece = King(Black), coordinates = blackKingInitialCoordinates),
+                    Square(piece = Bishop(Black), coordinates = Coordinates(col = 5, row = 0)),
+                    Square(piece = Knight(Black), coordinates = Coordinates(col = 6, row = 0)),
+                    Square(piece = Rook(Black), coordinates = Coordinates(col = 7, row = 0)),
+
+                    Square(piece = Pawn(Black), coordinates = Coordinates(col = 0, row = 1)),
+                    Square(piece = Pawn(Black), coordinates = Coordinates(col = 1, row = 1)),
+                    Square(piece = Pawn(Black), coordinates = Coordinates(col = 2, row = 1)),
+                    Square(piece = Pawn(Black), coordinates = Coordinates(col = 3, row = 1)),
+                    Square(piece = Pawn(Black), coordinates = Coordinates(col = 4, row = 1)),
+                    Square(piece = Pawn(Black), coordinates = Coordinates(col = 5, row = 1)),
+                    Square(piece = Pawn(Black), coordinates = Coordinates(col = 6, row = 1)),
+                    Square(piece = Pawn(Black), coordinates = Coordinates(col = 7, row = 1)),
+
+                    // White
+                    Square(piece = Pawn(White), coordinates = Coordinates(col = 0, row = 6)),
+                    Square(piece = Pawn(White), coordinates = Coordinates(col = 1, row = 6)),
+                    Square(piece = Pawn(White), coordinates = Coordinates(col = 2, row = 6)),
+                    Square(piece = Pawn(White), coordinates = Coordinates(col = 3, row = 6)),
+                    Square(piece = Pawn(White), coordinates = Coordinates(col = 4, row = 6)),
+                    Square(piece = Pawn(White), coordinates = Coordinates(col = 5, row = 6)),
+                    Square(piece = Pawn(White), coordinates = Coordinates(col = 6, row = 6)),
+                    Square(piece = Pawn(White), coordinates = Coordinates(col = 7, row = 6)),
+
+                    Square(piece = Rook(White), coordinates = Coordinates(col = 0, row = 7)),
+                    Square(piece = Knight(White), coordinates = Coordinates(col = 1, row = 7)),
+                    Square(piece = Bishop(White), coordinates = Coordinates(col = 2, row = 7)),
+                    Square(piece = Queen(White), coordinates = Coordinates(col = 3, row = 7)),
+                    Square(piece = King(White), coordinates = whiteKingInitialCoordinates),
+                    Square(piece = Bishop(White), coordinates = Coordinates(col = 5, row = 7)),
+                    Square(piece = Knight(White), coordinates = Coordinates(col = 6, row = 7)),
+                    Square(piece = Rook(White), coordinates = Coordinates(col = 7, row = 7)),
+                )
+            )
 
     fun move(
         from: Coordinates,
@@ -76,7 +123,8 @@ class Board private constructor(
                 mutableMap.remove(rookFrom)
                 mutableMap[rookTo] = Square(
                     piece = Rook(movedPiece.color, hasMoved = true),
-                    coordinates = rookTo)
+                    coordinates = rookTo
+                )
             }
         }
         return Board(mutableMap)
@@ -90,6 +138,8 @@ class Board private constructor(
         // Square out of bounds
             null
     }
+
+    fun getSquare(col: Int, row: Int) = getSquareOrNull(Coordinates(col, row))!!
 
     fun getPieceOrNull(coordinates: Coordinates) = getSquareOrNull(coordinates)?.piece
 
@@ -285,7 +335,14 @@ private fun isUnderRowOrColumnAttack(
                 colDelta = 0,
                 rowDelta = -1
             ) ||
-            isUnderAttackFrom(board, enemyColor, initialCoordinates, possiblettackingPieces, colDelta = 0, rowDelta = 1)
+            isUnderAttackFrom(
+                board,
+                enemyColor,
+                initialCoordinates,
+                possiblettackingPieces,
+                colDelta = 0,
+                rowDelta = 1
+            )
 }
 
 private fun isUnderAttackFrom(
