@@ -16,7 +16,7 @@ import kotlin.math.abs
 // High level API (extension functions)
 // board.canBeMovedTo(pieceColor, coordinates)
 
-class Board private constructor(
+data class Board(
     private val squareMap: Map<Coordinates, Square> = emptyMap(),
 ) {
     constructor(squareSet: Set<Square>) :
@@ -139,7 +139,8 @@ class Board private constructor(
             null
     }
 
-    fun getSquare(col: Int, row: Int) = getSquareOrNull(Coordinates(col, row))!!
+    fun getSquare(colIndex: Int, rowIndex: Int) = getSquareOrNull(Coordinates(colIndex, rowIndex))!!
+    fun getSquare(coordinates: Coordinates) = getSquareOrNull(coordinates)!!
 
     fun getPieceOrNull(coordinates: Coordinates) = getSquareOrNull(coordinates)?.piece
 
@@ -147,6 +148,59 @@ class Board private constructor(
     // the board is created and updated.
     fun getKingSquare(color: PieceColor) = squareMap.values.find { square ->
         square.piece is King && square.piece.color == color
+    }
+
+    // TODO write tests for this function?
+    fun clickSquare(colIndex: Int, rowIndex: Int): Board {
+        val square = getSquare(
+            colIndex = colIndex,
+            rowIndex = rowIndex,
+        )
+
+        return when {
+            square.isSelected -> {
+                copyAndDeselectAllSquares()
+                    .copyAndUpdateValidMoves(validMoves = emptySet())
+            }
+
+            square.isNotSelected && square.piece != null -> {
+                val validMoves = findValidMoves(
+                    board = this,
+                    coordinates = square.coordinates
+                )
+                copyAndDeselectAllSquares()
+                    .copyAndUpdateValidMoves(validMoves)
+                    .copyAndReplaceSquare(square.copy(isSelected = true))
+            }
+
+            else -> this
+        }
+    }
+
+    private fun copyAndUpdateValidMoves(validMoves: Set<Coordinates>): Board {
+        val mutableMap = squareMap.toMutableMap()
+        for (square in squareMap.values) {
+            if (square.isValidMove) mutableMap[square.coordinates] = square.copy(isValidMove = false)
+
+        }
+        for (coordinates in validMoves) {
+            mutableMap[coordinates] = getSquare(coordinates).copy(isValidMove = true)
+        }
+        return Board(mutableMap)
+    }
+
+    private fun copyAndDeselectAllSquares(): Board {
+        val mutableMap = squareMap.toMutableMap()
+        for (square in mutableMap.values) {
+            if (square.isSelected) mutableMap[square.coordinates] = square.copy(isSelected = false)
+        }
+        return Board(mutableMap)
+    }
+
+    private fun copyAndReplaceSquare(newSquare: Square): Board {
+        val mutableMap = squareMap.toMutableMap()
+        mutableMap[newSquare.coordinates] = newSquare
+        return Board(mutableMap)
     }
 
     companion object {

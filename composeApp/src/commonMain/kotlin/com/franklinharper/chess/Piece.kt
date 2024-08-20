@@ -192,7 +192,7 @@ sealed class Piece {
             val normalMoves = Board.neighborOffsets.mapNotNull {
                 val offsetCoordinates = Coordinates(
                     col = fromCoordinates.col + it.first,
-                    row = fromCoordinates.col + it.second,
+                    row = fromCoordinates.row + it.second,
                 )
                 board.getSquareOrNull(offsetCoordinates)
             }.filter { destinationSquare ->

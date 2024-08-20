@@ -4,9 +4,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class ViewModel {
-    fun onSquareClick(rowIndex: Int, colIndex: Int) {
-//        _state.value = newState
+    fun onSquareClick(colIndex: Int, rowIndex: Int) {
         println("clicked: col: $colIndex, row: $rowIndex")
+        val newBoard = _state.value.clickSquare(
+            colIndex = colIndex,
+            rowIndex = rowIndex,
+        )
+        _state.value = newBoard
     }
 
     private val _state = MutableStateFlow(Board())

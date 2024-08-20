@@ -27,17 +27,17 @@ class KingTest {
             setOf(
                 Square(
                     piece = King(Black, hasMoved = true),
-                    coordinates = Coordinates(col = 1, row = 1)
+                    coordinates = Coordinates(col = 1, row = 2)
                 ),
             )
         )
         assertEquals(
             expected = setOf(
-                Coordinates(col = 0, row = 0), Coordinates(col = 1, row = 0), Coordinates(col = 2, row = 0),
-                Coordinates(col = 0, row = 1), Coordinates(col = 2, row = 1),
-                Coordinates(col = 0, row = 2), Coordinates(col = 1, row = 2), Coordinates(col = 2, row = 2),
+                Coordinates(col = 0, row = 1), Coordinates(col = 1, row = 1), Coordinates(col = 2, row = 1),
+                Coordinates(col = 0, row = 2),                                Coordinates(col = 2, row = 2),
+                Coordinates(col = 0, row = 3), Coordinates(col = 1, row = 3), Coordinates(col = 2, row = 3),
             ),
-            actual = findValidMoves(board = board, coordinates = Coordinates(col = 1, row = 1))
+            actual = findValidMoves(board = board, coordinates = Coordinates(col = 1, row = 2))
         )
     }
 

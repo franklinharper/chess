@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,6 +24,7 @@ import chess.composeapp.generated.resources.black_knight
 import chess.composeapp.generated.resources.black_pawn
 import chess.composeapp.generated.resources.black_queen
 import chess.composeapp.generated.resources.black_rook
+import chess.composeapp.generated.resources.possible_move
 import chess.composeapp.generated.resources.white_bishop
 import chess.composeapp.generated.resources.white_king
 import chess.composeapp.generated.resources.white_knight
@@ -40,39 +42,79 @@ fun App() {
     val darkSquareBackground = Color(0xFF2AA835)
     val lightSquareBackground = Color.LightGray
     MaterialTheme {
+        // TODO use rememberSaveable so that the game state is preserved across
+        //  configuration changes and process death.
+        //
+        // A custom Saver implementation is necessary to use rememberSaveable
+        // Example:
+        // data class User(val name: String, val age: Int)
+        //
+        // val userSaver = Saver<User, Map<String, Any>>(
+        //    save = { user -> mapOf("name" to user.name, "age" to user.age) },
+        //    restore = { savedMap ->
+        //        User(
+        //            name = savedMap["name"] as String,
+        //            age = savedMap["age"] as Int
+        //        )
+        //    }
+        //)
         val viewModel = remember { createViewModel() }
         val state by viewModel.state.collectAsState()
+        println("state: $state")
 
 //        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                for (rowIndex in 0..7) {
-                    Row {
-                        for (colIndex in 0..7) {
-                            val square = state.getSquare(colIndex, rowIndex)
-                            Box(
-                                modifier = Modifier
-                                    // TODO calculate the size based on the screen size
-                                    .size(40.dp) // Size each square
-                                    .background(if ((rowIndex + colIndex) % 2 == 0) lightSquareBackground else darkSquareBackground)
-                                    .clickable { viewModel.onSquareClick(rowIndex, colIndex) },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                square.piece?.let { piece ->
-                                    Image(
-                                        painter = painterResource(piece.image),
-                                        contentDescription = null
-                                    )
-                                }
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            for (rowIndex in 0..7) {
+                Row {
+                    for (colIndex in 0..7) {
+                        val isLightSquare = (rowIndex + colIndex) % 2 == 0
+                        val square = state.getSquare(colIndex, rowIndex)
+                        val backgroundColor = if (isLightSquare) {
+                            when {
+                                square.isSelected -> Color.Red
+                                else -> lightSquareBackground
                             }
-
+                        } else {
+                            when {
+                                square.isSelected -> Color.Red
+                                else -> darkSquareBackground
+                            }
                         }
+                        Box(
+                            modifier = Modifier
+                                // TODO calculate the size based on the screen size
+                                .size(40.dp) // Size each square
+                                .background(backgroundColor)
+                                .clickable {
+                                    viewModel.onSquareClick(
+                                        colIndex = colIndex,
+                                        rowIndex = rowIndex,
+                                    )
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            square.piece?.let { piece ->
+                                Image(
+                                    painter = painterResource(piece.image),
+                                    contentDescription = null
+                                )
+                            }
+                            if (square.isValidMove) {
+                                Image(
+                                    painter = painterResource(Res.drawable.possible_move),
+                                    contentDescription = null
+                                )
+                            }
+                        }
+
                     }
                 }
             }
+        }
 //            AnimatedVisibility(showContent) {
 //                val greeting = remember { Greeting().greet() }
 //                Column(
