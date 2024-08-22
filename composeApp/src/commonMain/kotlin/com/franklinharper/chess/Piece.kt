@@ -169,13 +169,14 @@ sealed class Piece {
         ): Boolean {
             val cornerPiece = board.getPieceOrNull(cornerCoordinates)
             val cornerRookHasNotMoved = cornerPiece is Rook && cornerPiece.hasNotMoved()
-            val intermediateSquaresAreEmptyAndCannotBeAttacked = intermediateSquares.all { coordinates ->
-                squareIsEmptyAndCanNotBeAttacked(
-                    board = board,
-                    enemyColor = enemyColor,
-                    coordinates = coordinates,
-                )
-            }
+            val intermediateSquaresAreEmptyAndCannotBeAttacked =
+                intermediateSquares.all { coordinates ->
+                    squareIsEmptyAndCanNotBeAttacked(
+                        board = board,
+                        enemyColor = enemyColor,
+                        coordinates = coordinates,
+                    )
+                }
             return cornerRookHasNotMoved &&
                     intermediateSquaresAreEmptyAndCannotBeAttacked
         }
@@ -197,7 +198,8 @@ sealed class Piece {
                 board.getSquareOrNull(offsetCoordinates)
             }.filter { destinationSquare ->
                 val destinationPiece = board.getPieceOrNull(destinationSquare.coordinates)
-                val destinationSquareIsEmptyOrEnemy = destinationPiece == null || destinationPiece.color == enemyColor
+                val destinationSquareIsEmptyOrEnemy =
+                    destinationPiece == null || destinationPiece.color == enemyColor
                 val isUnderAttack = squareCanBeAttacked(
                     board = board,
                     attackingColor = enemyColor,
@@ -215,7 +217,8 @@ sealed class Piece {
             board: Board,
             king: King,
         ): Set<Coordinates> {
-            val kingCoordinates = if (color == White) whiteKingInitialCoordinates else blackKingInitialCoordinates
+            val kingCoordinates =
+                if (color == White) whiteKingInitialCoordinates else blackKingInitialCoordinates
             if (king.hasMoved || king.isInCheck(board, kingCoordinates)) {
                 return emptySet()
             }
@@ -399,12 +402,12 @@ sealed class Piece {
         }.filter { destinationSquare ->
             val destinationIsEmptyOrEnemy = destinationSquare.isEmpty() ||
                     destinationSquare.piece!!.color == enemyPieceColor
-            val kingIsNotInCheckAfterMove = kingIsNotInCheckAfterMove(
+
+            destinationIsEmptyOrEnemy && kingIsNotInCheckAfterMove(
                 board,
                 sourceCoordinates,
                 destinationSquare.coordinates
             )
-            destinationIsEmptyOrEnemy && kingIsNotInCheckAfterMove
         }.map { square ->
             square.coordinates
         }.toSet()
@@ -419,6 +422,10 @@ sealed class Piece {
             from = from,
             to = to
         )
+        if (newBoard.getKingSquare(color) == null) {
+            println("Couldn't find king")
+            println("$newBoard")
+        }
         val king = newBoard.getKingSquare(color)!!
         return !squareCanBeAttacked(
             board = newBoard,
@@ -462,7 +469,10 @@ sealed class Piece {
             rowDelta = 1,
         )
 
-    internal fun upperLeftDiagonal(board: Board, initialCoordinates: Coordinates): Collection<Coordinates> =
+    internal fun upperLeftDiagonal(
+        board: Board,
+        initialCoordinates: Coordinates,
+    ): Collection<Coordinates> =
         findPossibleMoveCoordinates(
             board = board,
             initialCoordinates = initialCoordinates,
@@ -470,7 +480,10 @@ sealed class Piece {
             rowDelta = -1,
         )
 
-    internal fun upperRightDiagonal(board: Board, initialCoordinates: Coordinates): Collection<Coordinates> =
+    internal fun upperRightDiagonal(
+        board: Board,
+        initialCoordinates: Coordinates,
+    ): Collection<Coordinates> =
         findPossibleMoveCoordinates(
             board = board,
             initialCoordinates = initialCoordinates,
@@ -478,7 +491,10 @@ sealed class Piece {
             rowDelta = -1,
         )
 
-    internal fun lowerRightDiagonal(board: Board, initialCoordinates: Coordinates): Collection<Coordinates> =
+    internal fun lowerRightDiagonal(
+        board: Board,
+        initialCoordinates: Coordinates,
+    ): Collection<Coordinates> =
         findPossibleMoveCoordinates(
             board = board,
             initialCoordinates = initialCoordinates,
@@ -486,7 +502,10 @@ sealed class Piece {
             rowDelta = 1,
         )
 
-    internal fun lowerLeftDiagonal(board: Board, initialCoordinates: Coordinates): Collection<Coordinates> =
+    internal fun lowerLeftDiagonal(
+        board: Board,
+        initialCoordinates: Coordinates,
+    ): Collection<Coordinates> =
         findPossibleMoveCoordinates(
             board = board,
             initialCoordinates = initialCoordinates,
@@ -510,12 +529,17 @@ sealed class Piece {
         var row = initialCoordinates.row + initialOffset(rowDelta)
         while (true) {
             val toCoordinates = Coordinates(col = col, row = row)
-            val toSquare = board.getSquareOrNull(toCoordinates) ?: return possibleMoves // Off the edge of the board
+            val toSquare = board.getSquareOrNull(toCoordinates)
+                ?: return possibleMoves // Off the edge of the board
             when {
                 toSquare.containsFriendlyPiece(friendlyColor = color) -> return possibleMoves
 
                 toSquare.containsEnemyPiece(friendlyColor = color) -> {
-                    if (kingIsNotInCheckAfterMove(board = board, from = initialCoordinates, to = toCoordinates)
+                    if (kingIsNotInCheckAfterMove(
+                            board = board,
+                            from = initialCoordinates,
+                            to = toCoordinates
+                        )
                     ) {
                         possibleMoves.add(toCoordinates)
                     }
@@ -523,7 +547,12 @@ sealed class Piece {
                 }
 
                 toSquare.isEmpty() -> {
-                    if (kingIsNotInCheckAfterMove(board = board, from = initialCoordinates, to = toCoordinates)) {
+                    if (kingIsNotInCheckAfterMove(
+                            board = board,
+                            from = initialCoordinates,
+                            to = toCoordinates
+                        )
+                    ) {
                         possibleMoves.add(toCoordinates)
                     }
                 }

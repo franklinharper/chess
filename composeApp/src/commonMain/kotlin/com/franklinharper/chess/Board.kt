@@ -17,7 +17,7 @@ import kotlin.math.abs
 // board.canBeMovedTo(pieceColor, coordinates)
 
 data class Board(
-    private val squareMap: Map<Coordinates, Square> = emptyMap(),
+    val squareMap: Map<Coordinates, Square> = emptyMap(),
     val moveColor: PieceColor,
 ) {
     constructor(squareSet: Set<Square>, moveColor: PieceColor = White) :
@@ -71,11 +71,15 @@ data class Board(
             )
 
     // TODO write tests for this function?
-    fun clickSquare(colIndex: Int, rowIndex: Int): Board {
+    fun clickSquare(
+        colIndex: Int,
+        rowIndex: Int,
+    ): Board {
         val square = getSquare(
             colIndex = colIndex,
             rowIndex = rowIndex,
         )
+        println("squareMap(4,7)=${squareMap[Coordinates(col = 4, row = 7)]}")
 
         return when {
             // Move a piece
@@ -92,6 +96,7 @@ data class Board(
                     board = this,
                     coordinates = square.coordinates
                 )
+                println("2 squareMap(4,7)=${squareMap[Coordinates(col = 4, row = 7)]}")
                 copyAndDeselectAllSquares()
                     .copyAndUpdateValidMoves(validMoves)
                     .copyAndReplaceSquare(square.copy(isSelected = true))
@@ -109,7 +114,7 @@ data class Board(
         to: Coordinates,
     ): Board {
         val mutableMap = squareMap.toMutableMap()
-        val piece = mutableMap[from]?.piece!!
+        val fromPiece = mutableMap[from]?.piece!!
 
         // Ensure that none of the friendly pawn's twoSquareAdvanceOnPreviousMove flags are set.
         for (square in mutableMap.values) {
@@ -121,17 +126,17 @@ data class Board(
                 break // Only one pawn can have made a 2 square advance on the previous move
             }
         }
-        val movedPiece = when (piece) {
+        val movedPiece = when (fromPiece) {
             is Pawn -> {
                 val twoSquareAdvance = abs(to.row - from.row) == 2
-                piece.copy(
+                fromPiece.copy(
                     hasMoved = true,
                     twoSquareAdvanceOnPreviousMove = twoSquareAdvance
                 )
             }
 
             else -> {
-                piece.copy(hasMoved = true)
+                fromPiece.copy(hasMoved = true)
             }
         }
         mutableMap.remove(key = from)
@@ -224,6 +229,10 @@ data class Board(
             squareMap = mutableMap,
             moveColor = moveColor
         )
+    }
+
+    override fun toString(): String {
+        return "moveColor=$moveColor, squares=${squareMap.values})"
     }
 
     companion object {
@@ -540,4 +549,3 @@ private fun isUnderKingAttack(
     piece = King(enemyColor),
     offsets = Board.neighborOffsets
 )
-

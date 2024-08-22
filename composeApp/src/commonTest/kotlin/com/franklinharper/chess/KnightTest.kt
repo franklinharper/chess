@@ -14,7 +14,7 @@ class KnightTest {
             setOf(
                 Square(
                     piece = King(White),
-                    coordinates = Piece.whiteKingInitialCoordinates
+                    coordinates = whiteKingInitialCoordinates
                 ),
                 Square(
                     piece = Knight(White),
@@ -46,7 +46,7 @@ class KnightTest {
             setOf(
                 Square(
                     piece = King(White),
-                    coordinates = Piece.whiteKingInitialCoordinates,
+                    coordinates = whiteKingInitialCoordinates,
                 ),
                 Square(
                     piece = Knight(White),
@@ -70,7 +70,7 @@ class KnightTest {
             setOf(
                 Square(
                     piece = King(White),
-                    coordinates = Piece.whiteKingInitialCoordinates,
+                    coordinates = whiteKingInitialCoordinates,
                 ),
                 Square(
                     piece = Knight(White),
@@ -156,6 +156,33 @@ class KnightTest {
         assertEquals(
             expected = setOf(Coordinates(col = 0, row = 2)),
             actual = findValidMoves(board = board, coordinates = Coordinates(col = 1, row = 0))
+        )
+    }
+
+    @Test
+    fun testKnightCantCaptureFriendlyKing() {
+        // This test reproduces a bug in move validation where the friendly king was removed
+        // from the board. This would cause a null pointer exception to be thrown.
+        val board = Board(
+            setOf(
+                // White
+                Square(piece = King(White), coordinates = whiteKingInitialCoordinates),
+                Square(piece = Knight(White), coordinates = Coordinates(col = 5, row = 5)),
+                // Black
+                Square(piece = Rook(Black), coordinates = Coordinates(col = 0, row = 2)),
+            )
+        )
+        assertEquals(
+            expected = setOf(
+                Coordinates(col = 3, row = 6),
+                Coordinates(col = 3, row = 4),
+                Coordinates(col = 4, row = 3),
+                Coordinates(col = 6, row = 3),
+                Coordinates(col = 7, row = 4),
+                Coordinates(col = 7, row = 6),
+                Coordinates(col = 6, row = 7),
+            ),
+            actual = findValidMoves(board = board, coordinates = Coordinates(col = 5, row = 5))
         )
     }
 }
