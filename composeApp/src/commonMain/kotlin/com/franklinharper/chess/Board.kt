@@ -6,6 +6,7 @@ import com.franklinharper.chess.Piece.Companion.whiteKingInitialCoordinates
 import com.franklinharper.chess.PieceColor.Black
 import com.franklinharper.chess.PieceColor.White
 import kotlin.math.abs
+import kotlin.reflect.KClass
 
 // Internal API
 // Board(squares: Set<Square>))
@@ -202,7 +203,8 @@ data class Board(
     private fun copyAndUpdateValidMoves(validMoves: Set<Coordinates>): Board {
         val mutableMap = squareMap.toMutableMap()
         for (square in squareMap.values) {
-            if (square.isValidMove) mutableMap[square.coordinates] = square.copy(isValidMove = false)
+            if (square.isValidMove) mutableMap[square.coordinates] =
+                square.copy(isValidMove = false)
 
         }
         for (coordinates in validMoves) {
@@ -355,7 +357,7 @@ private fun isUnderDiagonalAttack(
     enemyColor: PieceColor,
     initialCoordinates: Coordinates,
 ): Boolean {
-    val possibleAttackingPieces = setOf(Bishop(enemyColor), Queen(enemyColor))
+    val possibleAttackingPieces = setOf(Bishop::class, Queen::class)
     return isUnderAttackFrom(
         board = board,
         enemyColor,
@@ -396,7 +398,7 @@ private fun isUnderRowOrColumnAttack(
     enemyColor: PieceColor,
     initialCoordinates: Coordinates,
 ): Boolean {
-    val possiblettackingPieces = setOf(Rook(enemyColor), Queen(enemyColor))
+    val possiblettackingPieces = setOf(Rook::class, Queen::class)
     return isUnderAttackFrom(
         board,
         enemyColor,
@@ -435,7 +437,7 @@ private fun isUnderAttackFrom(
     board: Board,
     enemyColor: PieceColor,
     initialCoordinates: Coordinates,
-    allowedAttackingPieces: Set<Piece>,
+    allowedAttackingPieces: Set<KClass<out Piece>>,
     colDelta: Int,
     rowDelta: Int,
 ): Boolean {
@@ -445,7 +447,9 @@ private fun isUnderAttackFrom(
         colDelta = colDelta,
         rowDelta = rowDelta
     )
-    return firstPiece != null && (firstPiece in allowedAttackingPieces && firstPiece.color == enemyColor)
+    return firstPiece != null
+            && (firstPiece::class in allowedAttackingPieces
+            && firstPiece.color == enemyColor)
 }
 
 // Search for first piece in a given direction starting from the initial coordinates.
@@ -513,7 +517,8 @@ private fun findPieceByOffsets(
     return offsets.any { offset ->
         val col = originCoordinates.col + offset.first
         val row = originCoordinates.row + offset.second
-        piece == board.getPieceOrNull(Coordinates(col = col, row = row))
+        val otherPiece = board.getPieceOrNull(Coordinates(col = col, row = row))
+        piece.isSameColorAndTypeAs(otherPiece)
     }
 }
 

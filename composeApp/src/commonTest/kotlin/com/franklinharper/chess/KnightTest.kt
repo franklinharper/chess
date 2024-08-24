@@ -1,6 +1,7 @@
 package com.franklinharper.chess
 
 import com.franklinharper.chess.Piece.*
+import com.franklinharper.chess.Piece.Companion.blackKingInitialCoordinates
 import com.franklinharper.chess.Piece.Companion.whiteKingInitialCoordinates
 import com.franklinharper.chess.PieceColor.*
 import kotlin.test.Test
@@ -183,6 +184,26 @@ class KnightTest {
                 Coordinates(col = 6, row = 7),
             ),
             actual = findValidMoves(board = board, coordinates = Coordinates(col = 5, row = 5))
+        )
+    }
+
+    @Test
+    fun testPawnCantMoveWhenEnemyKnightAttacksFriendlyKing() {
+        // This test reproduces a bug in
+        val board = Board()
+            // Kingside knight teleports to attack the enemy king!
+            .move(
+                from = Coordinates(col = 6, row = 7),
+                to = Coordinates(col = 3, row = 2)
+            )
+
+        assertEquals(
+            // The pawn can't move because it's king is in check
+            expected = emptySet(),
+            actual = findValidMoves(
+                board = board,
+                coordinates = Coordinates(col = 6, row = 1)
+            )
         )
     }
 }

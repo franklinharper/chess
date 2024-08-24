@@ -1,8 +1,5 @@
 package com.franklinharper.chess
 
-import com.franklinharper.chess.Board
-import com.franklinharper.chess.PieceColor
-import com.franklinharper.chess.squareCanBeAttacked
 import com.franklinharper.chess.PieceColor.White
 
 // Could this be a sealed interface?
@@ -59,6 +56,9 @@ sealed class Piece {
     abstract fun copy(hasMoved: Boolean): Piece
 
     private fun hasNotMoved() = !hasMoved
+
+    fun isSameColorAndTypeAs(other: Piece?) =
+        other != null && color == other.color && this::class == other::class
 
     data class Rook(
         override val color: PieceColor,
@@ -400,10 +400,9 @@ sealed class Piece {
             )
             board.getSquareOrNull(offsetCoordinates)
         }.filter { destinationSquare ->
-            val destinationIsEmptyOrEnemy = destinationSquare.isEmpty() ||
-                    destinationSquare.piece!!.color == enemyPieceColor
-
-            destinationIsEmptyOrEnemy && kingIsNotInCheckAfterMove(
+            (destinationSquare.isEmpty() || destinationSquare.piece!!.color == enemyPieceColor)
+        }.filter { destinationSquare ->
+            kingIsNotInCheckAfterMove(
                 board,
                 sourceCoordinates,
                 destinationSquare.coordinates
@@ -422,10 +421,6 @@ sealed class Piece {
             from = from,
             to = to
         )
-        if (newBoard.getKingSquare(color) == null) {
-            println("Couldn't find king")
-            println("$newBoard")
-        }
         val king = newBoard.getKingSquare(color)!!
         return !squareCanBeAttacked(
             board = newBoard,

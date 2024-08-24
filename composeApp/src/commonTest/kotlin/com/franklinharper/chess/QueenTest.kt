@@ -203,4 +203,34 @@ class QueenTest {
             actual = findValidMoves(board = board, coordinates = Coordinates(col = 1, row = 1))
         )
     }
+
+    @Test
+    fun testPawnCantMoveWhenEnemyQueenAttacksItsKing() {
+        val board = Board()
+            // White pawn advances
+            .move(
+                from = Coordinates(col = 4, row = 6),
+                to = Coordinates(col = 4, row = 5)
+            )
+            // Black pawn advances
+            .move(
+                from = Coordinates(col = 5, row = 1),
+                to = Coordinates(col = 5, row = 2)
+            )
+            // White queen attacks black king
+            .move(
+                from = Coordinates(col = 3, row = 7),
+                to = Coordinates(col = 7, row = 3)
+            )
+
+        assertEquals(
+            // This pawn can't move because it's king is in check
+            expected = emptySet(),
+            actual = findValidMoves(
+                board = board,
+                coordinates = Coordinates(col = 0, row = 1)
+            )
+        )
+    }
+
 }
