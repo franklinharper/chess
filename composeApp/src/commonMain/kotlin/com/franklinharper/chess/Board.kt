@@ -194,7 +194,7 @@ data class Board(
     // the board is created and updated.
     fun getKingSquare(color: PieceColor) = squareMap.values.find { square ->
         square.piece is King && square.piece.color == color
-    }
+    }!!
 
     // This function could be made faster by storing the select square's coordinates when
     // the board is created and updated.
@@ -237,6 +237,34 @@ data class Board(
         return "moveColor=$moveColor, squares=${squareMap.values})"
     }
 
+    fun isCheckmate(color: PieceColor): Boolean {
+        val kingSquare = getKingSquare(color)
+        val kingsValidMoves = findValidMoves(
+            board = this,
+            coordinates = kingSquare.coordinates
+        )
+        val king = kingSquare.piece as King
+        val kingInCheck = king.isInCheck(
+            board = this,
+            originCoordinates = kingSquare.coordinates
+        )
+        return kingInCheck && kingsValidMoves.isEmpty()
+    }
+
+    fun isStalemate(color: PieceColor): Boolean {
+        val kingSquare = getKingSquare(color)
+        val king = kingSquare.piece as King
+        val kingNotInCheck = !king.isInCheck(
+            board = this,
+            originCoordinates = kingSquare.coordinates
+        )
+        val validMoves = findAllValidMovesByColor(
+            board = this,
+            color = color
+        )
+        return kingNotInCheck && validMoves.isEmpty()
+    }
+
     companion object {
         val neighborOffsets = setOf(
             // Offsets are Pair(col, row)
@@ -255,6 +283,25 @@ data class Board(
 fun findValidMoves(board: Board, coordinates: Coordinates): Set<Coordinates> =
     board.getPieceOrNull(coordinates)!!
         .findMoveDestinationCoordinates(board, coordinates)
+
+fun findAllValidMovesByColor(board: Board, color: PieceColor): Set<Move> =
+    board.squareMap
+        .filter { (coordinates, square) ->
+            square.piece?.color == color
+        }
+        .values
+        .flatMap { square ->
+            findValidMoves(
+                board,
+                square.coordinates
+            ).map { toCoordinates ->
+                Move(
+                    from = square.coordinates,
+                    to = toCoordinates
+                )
+            }
+        }
+        .toSet()
 
 //    //    private val squares: Array<Array<Square>> = arrayOf(
 //    //        arrayOf(

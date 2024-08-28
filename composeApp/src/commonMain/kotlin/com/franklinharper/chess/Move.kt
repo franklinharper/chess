@@ -1,6 +1,6 @@
 package com.franklinharper.chess
 
-class Move(
-    val origin: Square,
-    val destination: Square,
+data class Move(
+    val from: Coordinates,
+    val to: Coordinates,
 )

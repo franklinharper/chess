@@ -17,6 +17,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import com.franklinharper.chess.PieceColor.White
 import com.franklinharper.chess.PieceColor.Black
+import kotlin.test.assertTrue
 
 
 class KingTest {
@@ -400,5 +401,33 @@ class KingTest {
         assertFalse(actual.contains(Piece.whiteQueensideCastle))
         // Kingside castling is NOT possible
         assertFalse(actual.contains(whiteKingsideCastle))
+    }
+
+    @Test
+    fun testCheckmate() {
+        val board = Board(
+            // Black
+            setOf(
+                Square(piece = King(Black), coordinates = blackKingInitialCoordinates),
+                // White
+                Square(piece = Queen(White), coordinates = Coordinates(col = 4, row = 1)),
+                Square(piece = King(White), coordinates = Coordinates(col = 4, row = 2)),),
+            )
+        assertFalse(board.isCheckmate(White))
+        assertTrue(board.isCheckmate(Black))
+    }
+
+    @Test
+    fun testStalemate() {
+        val board = Board(
+            // Black
+            setOf(
+                Square(piece = King(Black), coordinates = blackKingInitialCoordinates),
+                // White
+                Square(piece = Bishop(White), coordinates = Coordinates(col = 4, row = 1)),
+                Square(piece = King(White), coordinates = Coordinates(col = 4, row = 2)),),
+        )
+        assertFalse(board.isStalemate(White))
+        assertTrue(board.isStalemate(Black))
     }
 }
