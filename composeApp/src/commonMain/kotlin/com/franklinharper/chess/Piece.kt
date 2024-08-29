@@ -39,13 +39,12 @@ sealed class Piece {
     // This is because, in this move, a friendly piece can capture that enemy piece
     // This would put the friendly piece that captured under attack.
     //
-    // An important example of this is when a King can't capture a piece because
-    // it would put itself in check. Because of this some
-    // A King cannot move into check when the attacking enemy piece is itself pinned
+    // A King cannot move into check when the attacking enemy piece is itself pinned.
+    //
     // Some possible attacks are not valid moves. An example of is when a piece is pinned.
     // A pinned piece has a set of possible attacks; but some won't be valid moves because they
     // would expose the King to an attack.
-    abstract fun findMoveDestinationCoordinates(
+    abstract fun findMoveToCoordinates(
         board: Board,
         fromCoordinates: Coordinates,
     ): Set<Coordinates>
@@ -64,7 +63,7 @@ sealed class Piece {
         override val color: PieceColor,
         override val hasMoved: Boolean = false,
     ) : Piece() {
-        override fun findMoveDestinationCoordinates(
+        override fun findMoveToCoordinates(
             board: Board,
             fromCoordinates: Coordinates,
         ): Set<Coordinates> {
@@ -103,7 +102,7 @@ sealed class Piece {
             Pair(1, 2),
         )
 
-        override fun findMoveDestinationCoordinates(
+        override fun findMoveToCoordinates(
             board: Board,
             fromCoordinates: Coordinates,
         ): Set<Coordinates> = findPossibleMovesByOffsets(
@@ -119,10 +118,7 @@ sealed class Piece {
         override val color: PieceColor,
         override val hasMoved: Boolean = false,
     ) : Piece() {
-        // We aren't checking if Bishops are on a Square of the same color as the Bishop.
-        // This allows an issue to occur when a Bishop is put on a Square where the color of the Square doesn't
-        // match the color of the Bishop.
-        override fun findMoveDestinationCoordinates(
+        override fun findMoveToCoordinates(
             board: Board,
             fromCoordinates: Coordinates,
         ): Set<Coordinates> {
@@ -143,11 +139,11 @@ sealed class Piece {
     ) : Piece() {
         fun isInCheck(
             board: Board,
-            originCoordinates: Coordinates,
+            kingCoordinates: Coordinates,
         ): Boolean = squareCanBeAttacked(
             board = board,
             attackingColor = color.enemyColor(),
-            coordinates = originCoordinates,
+            coordinates = kingCoordinates,
         )
 
         private fun squareIsEmptyAndCanNotBeAttacked(
@@ -181,7 +177,7 @@ sealed class Piece {
                     intermediateSquaresAreEmptyAndCannotBeAttacked
         }
 
-        override fun findMoveDestinationCoordinates(
+        override fun findMoveToCoordinates(
             board: Board,
             fromCoordinates: Coordinates,
         ): Set<Coordinates> {
@@ -262,7 +258,7 @@ sealed class Piece {
         override val color: PieceColor,
         override val hasMoved: Boolean = false,
     ) : Piece() {
-        override fun findMoveDestinationCoordinates(
+        override fun findMoveToCoordinates(
             board: Board,
             fromCoordinates: Coordinates,
         ): Set<Coordinates> {
@@ -291,7 +287,7 @@ sealed class Piece {
         val twoSquareAdvanceOnPreviousMove: Boolean = false,
     ) : Piece() {
 
-        override fun findMoveDestinationCoordinates(
+        override fun findMoveToCoordinates(
             board: Board,
             fromCoordinates: Coordinates,
         ): Set<Coordinates> {
@@ -421,7 +417,7 @@ sealed class Piece {
             from = from,
             to = to
         )
-        val king = newBoard.getKingSquare(color)!!
+        val king = newBoard.getKingSquare(color)
         return !squareCanBeAttacked(
             board = newBoard,
             attackingColor = color.enemyColor(),

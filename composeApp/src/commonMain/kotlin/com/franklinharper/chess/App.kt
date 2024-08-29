@@ -8,12 +8,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,8 +46,6 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 @Preview
 fun App() {
-    val darkSquareBackground = Color(0xFF2AA835)
-    val lightSquareBackground = Color.LightGray
     MaterialTheme {
         // TODO use rememberSaveable so that the game state is preserved across
         //  configuration changes and process death.
@@ -62,60 +66,44 @@ fun App() {
         val viewModel = remember { createViewModel() }
         val state by viewModel.state.collectAsState()
         println("state: $state")
+        var expanded by remember { mutableStateOf(false) }
 
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text("${state.moveColor}'s move")
-            for (rowIndex in 0..7) {
-                Row {
-                    for (colIndex in 0..7) {
-                        val isLightSquare = (rowIndex + colIndex) % 2 == 0
-                        val square = state.getSquare(colIndex, rowIndex)
-                        val backgroundColor = if (isLightSquare) {
-                            when {
-                                square.isSelected -> Color.Red
-                                else -> lightSquareBackground
-                            }
-                        } else {
-                            when {
-                                square.isSelected -> Color.Red
-                                else -> darkSquareBackground
-                            }
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Chess") },
+                    actions = {
+                        IconButton(onClick = { expanded = true }) {
+                            Icon(Icons.Default.MoreVert, contentDescription = "More actions")
                         }
-                        Box(
-                            modifier = Modifier
-                                // TODO calculate the size based on the screen size
-                                .size(40.dp) // Size each square
-                                .background(backgroundColor)
-                                .clickable {
-                                    viewModel.onSquareClick(
-                                        colIndex = colIndex,
-                                        rowIndex = rowIndex,
-                                    )
-                                },
-                            contentAlignment = Alignment.Center
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
                         ) {
-                            square.piece?.let { piece ->
-                                Image(
-                                    painter = painterResource(piece.image),
-                                    contentDescription = null
-                                )
+                            DropdownMenuItem(
+                                onClick = {
+                                    expanded = false
+                                    viewModel.onNewGameClick()
+                                }
+                            ) {
+                                Text("New Game")
                             }
-                            if (square.isValidMove) {
-                                Image(
-                                    painter = painterResource(Res.drawable.possible_move),
-                                    contentDescription = null
-                                )
+                            DropdownMenuItem(
+                                onClick = {
+                                    expanded = false
+                                    viewModel.onSetEndGamePositionClick()
+                                }
+                            ) {
+                                Text("Set end Game position")
                             }
                         }
-
                     }
-                }
+                )
             }
+        ) {
+            ChessBoard(state, viewModel)
         }
+
 //            AnimatedVisibility(showContent) {
 //                val greeting = remember { Greeting().greet() }
 //                Column(
@@ -127,6 +115,69 @@ fun App() {
 //                }
 //            }
 //        }
+    }
+}
+
+val darkSquareBackground = Color(0xFF2AA835)
+val lightSquareBackground = Color.LightGray
+
+@Composable
+private fun ChessBoard(
+    state: Board,
+    viewModel: ViewModel,
+) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("${state.boardStatus}")
+        for (rowIndex in 0..7) {
+            Row {
+                for (colIndex in 0..7) {
+                    val isLightSquare = (rowIndex + colIndex) % 2 == 0
+                    val square = state.getSquare(colIndex, rowIndex)
+                    val backgroundColor = if (isLightSquare) {
+                        when {
+                            square.isSelected -> Color.Red
+                            else -> lightSquareBackground
+                        }
+                    } else {
+                        when {
+                            square.isSelected -> Color.Red
+                            else -> darkSquareBackground
+                        }
+                    }
+                    Box(
+                        modifier = Modifier
+                            // TODO calculate the size based on the screen size
+                            .size(40.dp) // Size each square
+                            .background(backgroundColor)
+                            .clickable {
+                                viewModel.onSquareClick(
+                                    colIndex = colIndex,
+                                    rowIndex = rowIndex,
+                                )
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        square.piece?.let { piece ->
+                            Image(
+                                painter = painterResource(piece.image),
+                                contentDescription = null
+                            )
+                        }
+                        if (square.isValidMove) {
+                            Image(
+                                painter = painterResource(Res.drawable.possible_move),
+                                contentDescription = null
+                            )
+                        }
+                    }
+
+                }
+            }
+        }
     }
 }
 

@@ -1,5 +1,6 @@
 package com.franklinharper.chess
 
+import com.franklinharper.chess.BoardStatus.*
 import com.franklinharper.chess.Piece.*
 import com.franklinharper.chess.Piece.Companion.blackKingInitialCoordinates
 import com.franklinharper.chess.Piece.Companion.whiteKingInitialCoordinates
@@ -19,18 +20,18 @@ import kotlin.reflect.KClass
 
 data class Board(
     val squareMap: Map<Coordinates, Square> = emptyMap(),
-    val moveColor: PieceColor,
+    val boardStatus: BoardStatus,
 ) {
-    constructor(squareSet: Set<Square>, moveColor: PieceColor = White) :
+    constructor(squares: Set<Square>, boardStatus: BoardStatus = WhitesMove) :
             this(
-                squareMap = squareSet.associateBy { square -> square.coordinates },
-                moveColor = moveColor
+                squareMap = squares.associateBy { square -> square.coordinates },
+                boardStatus = boardStatus
             )
 
     constructor() :
             this(
-                moveColor = White,
-                squareSet = setOf(
+                boardStatus = WhitesMove,
+                squares = setOf(
                     // Black
                     Square(piece = Rook(Black), coordinates = Coordinates(col = 0, row = 0)),
                     Square(piece = Knight(Black), coordinates = Coordinates(col = 1, row = 0)),
@@ -83,7 +84,7 @@ data class Board(
         println("squareMap(4,7)=${squareMap[Coordinates(col = 4, row = 7)]}")
 
         return when {
-            // Move a piece
+            // Move piece
             square.isValidMove -> {
                 val fromSquare = getSelectedSquare()!!
                 copyAndDeselectAllSquares()
@@ -91,13 +92,15 @@ data class Board(
                     .move(from = fromSquare.coordinates, to = square.coordinates)
             }
 
-            // Select a square
-            square.isNotSelected && square.piece != null && square.piece.color == moveColor -> {
+            // Select square
+            square.isNotSelected
+                    && square.piece != null
+                    && square.piece.color == boardStatus.toColor() -> {
+
                 val validMoves = findValidMoves(
                     board = this,
                     coordinates = square.coordinates
                 )
-                println("2 squareMap(4,7)=${squareMap[Coordinates(col = 4, row = 7)]}")
                 copyAndDeselectAllSquares()
                     .copyAndUpdateValidMoves(validMoves)
                     .copyAndReplaceSquare(square.copy(isSelected = true))
@@ -173,7 +176,16 @@ data class Board(
                 )
             }
         }
-        return Board(squareMap = mutableMap, moveColor = moveColor.enemyColor())
+        val newStatus = when {
+            isCheckmate(Black) -> WhiteWin
+            isStalemate(Black) -> Stalemate
+            isCheckmate(White) -> BlackWin
+            isStalemate(White) -> Stalemate
+            boardStatus == BlacksMove-> WhitesMove
+            boardStatus == WhitesMove-> BlacksMove
+            else -> throw IllegalStateException("Invalid board status")
+        }
+        return Board(squareMap = mutableMap, boardStatus = newStatus)
     }
 
     fun getSquareOrNull(coordinates: Coordinates) = squareMap.getOrElse(coordinates) {
@@ -212,7 +224,7 @@ data class Board(
         }
         return Board(
             squareMap = mutableMap,
-            moveColor = moveColor
+            boardStatus = boardStatus
         )
     }
 
@@ -221,7 +233,7 @@ data class Board(
         for (square in mutableMap.values) {
             if (square.isSelected) mutableMap[square.coordinates] = square.copy(isSelected = false)
         }
-        return Board(squareMap = mutableMap, moveColor = moveColor)
+        return Board(squareMap = mutableMap, boardStatus = boardStatus)
     }
 
     private fun copyAndReplaceSquare(newSquare: Square): Board {
@@ -229,12 +241,12 @@ data class Board(
         mutableMap[newSquare.coordinates] = newSquare
         return Board(
             squareMap = mutableMap,
-            moveColor = moveColor
+            boardStatus = boardStatus
         )
     }
 
     override fun toString(): String {
-        return "moveColor=$moveColor, squares=${squareMap.values})"
+        return "moveColor=$boardStatus, squares=${squareMap.values})"
     }
 
     fun isCheckmate(color: PieceColor): Boolean {
@@ -246,7 +258,7 @@ data class Board(
         val king = kingSquare.piece as King
         val kingInCheck = king.isInCheck(
             board = this,
-            originCoordinates = kingSquare.coordinates
+            kingCoordinates = kingSquare.coordinates
         )
         return kingInCheck && kingsValidMoves.isEmpty()
     }
@@ -254,18 +266,57 @@ data class Board(
     fun isStalemate(color: PieceColor): Boolean {
         val kingSquare = getKingSquare(color)
         val king = kingSquare.piece as King
-        val kingNotInCheck = !king.isInCheck(
+        val kingInCheck = king.isInCheck(
             board = this,
-            originCoordinates = kingSquare.coordinates
+            kingCoordinates = kingSquare.coordinates
         )
+        if (kingInCheck) return false
+
+        val kingsValidMoves = findValidMoves(
+            board = this,
+            coordinates = kingSquare.coordinates
+        )
+        if (kingsValidMoves.isNotEmpty()) return false
+
         val validMoves = findAllValidMovesByColor(
             board = this,
             color = color
         )
-        return kingNotInCheck && validMoves.isEmpty()
+        return validMoves.isEmpty()
     }
 
     companion object {
+        val endGameSetupForTesting = setOf(
+            // Black
+            Square(
+                piece = King(Black, hasMoved = true),
+                coordinates = Coordinates(col = 3, row = 0)
+            ),
+
+            Square(
+                piece = Pawn(Black, hasMoved = true),
+                coordinates = Coordinates(col = 0, row = 1)
+            ),
+
+            // White
+            Square(
+                piece = Queen(White, hasMoved = true),
+                coordinates = Coordinates(col = 6, row = 1)
+            ),
+            Square(
+                piece = Pawn(White, hasMoved = true),
+                coordinates = Coordinates(col = 7, row = 1)
+            ),
+            Square(
+                piece = King(White, hasMoved = true),
+                coordinates = Coordinates(col = 3, row = 2)
+            ),
+            Square(
+                piece = Bishop(White, hasMoved = true),
+                coordinates = Coordinates(col = 0, row = 4)
+            ),
+        )
+
         val neighborOffsets = setOf(
             // Offsets are Pair(col, row)
             // Row above
@@ -282,18 +333,18 @@ data class Board(
 
 fun findValidMoves(board: Board, coordinates: Coordinates): Set<Coordinates> =
     board.getPieceOrNull(coordinates)!!
-        .findMoveDestinationCoordinates(board, coordinates)
+        .findMoveToCoordinates(board, coordinates)
 
 fun findAllValidMovesByColor(board: Board, color: PieceColor): Set<Move> =
     board.squareMap
-        .filter { (coordinates, square) ->
+        .values
+        .filter { square ->
             square.piece?.color == color
         }
-        .values
         .flatMap { square ->
             findValidMoves(
-                board,
-                square.coordinates
+                board = board,
+                coordinates = square.coordinates
             ).map { toCoordinates ->
                 Move(
                     from = square.coordinates,
@@ -407,33 +458,33 @@ private fun isUnderDiagonalAttack(
     val possibleAttackingPieces = setOf(Bishop::class, Queen::class)
     return isUnderAttackFrom(
         board = board,
-        enemyColor,
-        initialCoordinates,
-        possibleAttackingPieces,
+        enemyColor = enemyColor,
+        initialCoordinates = initialCoordinates,
+        allowedAttackingPieces = possibleAttackingPieces,
         colDelta = -1,
         rowDelta = -1
     ) ||
             isUnderAttackFrom(
                 board = board,
-                enemyColor,
-                initialCoordinates,
-                possibleAttackingPieces,
+                enemyColor = enemyColor,
+                initialCoordinates = initialCoordinates,
+                allowedAttackingPieces = possibleAttackingPieces,
                 colDelta = 1,
                 rowDelta = -1
             ) ||
             isUnderAttackFrom(
                 board = board,
-                enemyColor,
-                initialCoordinates,
-                possibleAttackingPieces,
+                enemyColor = enemyColor,
+                initialCoordinates = initialCoordinates,
+                allowedAttackingPieces = possibleAttackingPieces,
                 colDelta = -1,
                 rowDelta = 1
             ) ||
             isUnderAttackFrom(
                 board = board,
-                enemyColor,
-                initialCoordinates,
-                possibleAttackingPieces,
+                enemyColor = enemyColor,
+                initialCoordinates = initialCoordinates,
+                allowedAttackingPieces = possibleAttackingPieces,
                 colDelta = 1,
                 rowDelta = 1
             )
@@ -447,34 +498,34 @@ private fun isUnderRowOrColumnAttack(
 ): Boolean {
     val possiblettackingPieces = setOf(Rook::class, Queen::class)
     return isUnderAttackFrom(
-        board,
-        enemyColor,
-        initialCoordinates,
-        possiblettackingPieces,
+        board = board,
+        enemyColor = enemyColor,
+        initialCoordinates = initialCoordinates,
+        allowedAttackingPieces = possiblettackingPieces,
         colDelta = -1,
         rowDelta = 0
     ) ||
             isUnderAttackFrom(
-                board,
-                enemyColor,
-                initialCoordinates,
-                possiblettackingPieces,
+                board = board,
+                enemyColor = enemyColor,
+                initialCoordinates = initialCoordinates,
+                allowedAttackingPieces = possiblettackingPieces,
                 colDelta = 1,
                 rowDelta = 0
             ) ||
             isUnderAttackFrom(
-                board,
-                enemyColor,
-                initialCoordinates,
-                possiblettackingPieces,
+                board = board,
+                enemyColor = enemyColor,
+                initialCoordinates = initialCoordinates,
+                allowedAttackingPieces = possiblettackingPieces,
                 colDelta = 0,
                 rowDelta = -1
             ) ||
             isUnderAttackFrom(
-                board,
-                enemyColor,
-                initialCoordinates,
-                possiblettackingPieces,
+                board = board,
+                enemyColor = enemyColor,
+                initialCoordinates = initialCoordinates,
+                allowedAttackingPieces = possiblettackingPieces,
                 colDelta = 0,
                 rowDelta = 1
             )
