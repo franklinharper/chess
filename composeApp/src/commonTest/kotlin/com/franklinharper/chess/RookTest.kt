@@ -125,7 +125,11 @@ class RookTest {
         )
         assertEquals(
             expected = emptySet(),
-            actual = findValidMoves(board = board, coordinates = Coordinates(col = 1, row = 1))
+            actual = findValidMoves(
+                board = board,
+                coordinates = Coordinates(col = 1, row = 1),
+                checkForStalemate = false
+            )
         )
     }
 
@@ -144,7 +148,11 @@ class RookTest {
         )
         assertEquals(
             expected = setOf(Coordinates(col = 0, row = 1)),
-            actual = findValidMoves(board = board, coordinates = Coordinates(col = 1, row = 1))
+            actual = findValidMoves(
+                board = board,
+                coordinates = Coordinates(col = 1, row = 1),
+                checkForStalemate = false
+            )
         )
     }
 
@@ -163,7 +171,11 @@ class RookTest {
         )
         assertEquals(
             expected = setOf(Coordinates(col = 0, row = 2)),
-            actual = findValidMoves(board = board, coordinates = Coordinates(col = 1, row = 2))
+            actual = findValidMoves(
+                board = board,
+                coordinates = Coordinates(col = 1, row = 2),
+                checkForStalemate = false
+            )
         )
     }
 }

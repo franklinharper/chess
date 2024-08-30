@@ -177,7 +177,11 @@ class QueenTest {
         // The only possible move for the Queen is to capture the attacking Rook
         assertEquals(
             expected = setOf(Coordinates(col = 0, row = 2)),
-            actual = findValidMoves(board = board, coordinates = queenCoordinates)
+            actual = findValidMoves(
+                board = board,
+                coordinates = queenCoordinates,
+                checkForStalemate = false
+            )
         )
     }
 
@@ -200,7 +204,11 @@ class QueenTest {
                 // Queen can block the rook attack
                 Coordinates(col = 0, row = 1)
             ),
-            actual = findValidMoves(board = board, coordinates = Coordinates(col = 1, row = 1))
+            actual = findValidMoves(
+                board = board,
+                coordinates = Coordinates(col = 1, row = 1),
+                checkForStalemate = false
+            )
         )
     }
 
@@ -228,7 +236,8 @@ class QueenTest {
             expected = emptySet(),
             actual = findValidMoves(
                 board = board,
-                coordinates = Coordinates(col = 0, row = 1)
+                coordinates = Coordinates(col = 0, row = 1),
+                checkForStalemate = false
             )
         )
     }

@@ -89,7 +89,11 @@ data class Board(
                 val fromSquare = getSelectedSquare()!!
                 copyAndDeselectAllSquares()
                     .copyAndUpdateValidMoves(emptySet())
-                    .move(from = fromSquare.coordinates, to = square.coordinates)
+                    .move(
+                        from = fromSquare.coordinates,
+                        to = square.coordinates,
+                        checkForStalemate = true,
+                    )
             }
 
             // Select square
@@ -99,7 +103,8 @@ data class Board(
 
                 val validMoves = findValidMoves(
                     board = this,
-                    coordinates = square.coordinates
+                    coordinates = square.coordinates,
+                    checkForStalemate = false
                 )
                 copyAndDeselectAllSquares()
                     .copyAndUpdateValidMoves(validMoves)
@@ -116,7 +121,28 @@ data class Board(
     fun move(
         from: Coordinates,
         to: Coordinates,
+        checkForStalemate: Boolean = true,
     ): Board {
+        val newMap = copyMapAndMakeMove(
+            to = to,
+            from = from
+        )
+        val newStatus = when {
+            isCheckmate(Black) -> WhiteWin
+            checkForStalemate && isStalemate(Black) -> Stalemate
+            isCheckmate(White) -> BlackWin
+            checkForStalemate && isStalemate(White) -> Stalemate
+            boardStatus == BlacksMove-> WhitesMove
+            boardStatus == WhitesMove-> BlacksMove
+            else -> throw IllegalStateException("Invalid board status")
+        }
+        return Board(squareMap = newMap, boardStatus = newStatus)
+    }
+
+    private fun copyMapAndMakeMove(
+        to: Coordinates,
+        from: Coordinates,
+    ): Map<Coordinates, Square> {
         val mutableMap = squareMap.toMutableMap()
         val fromPiece = mutableMap[from]?.piece!!
 
@@ -176,16 +202,7 @@ data class Board(
                 )
             }
         }
-        val newStatus = when {
-            isCheckmate(Black) -> WhiteWin
-            isStalemate(Black) -> Stalemate
-            isCheckmate(White) -> BlackWin
-            isStalemate(White) -> Stalemate
-            boardStatus == BlacksMove-> WhitesMove
-            boardStatus == WhitesMove-> BlacksMove
-            else -> throw IllegalStateException("Invalid board status")
-        }
-        return Board(squareMap = mutableMap, boardStatus = newStatus)
+        return mutableMap
     }
 
     fun getSquareOrNull(coordinates: Coordinates) = squareMap.getOrElse(coordinates) {
@@ -253,7 +270,8 @@ data class Board(
         val kingSquare = getKingSquare(color)
         val kingsValidMoves = findValidMoves(
             board = this,
-            coordinates = kingSquare.coordinates
+            coordinates = kingSquare.coordinates,
+            checkForStalemate = false
         )
         val king = kingSquare.piece as King
         val kingInCheck = king.isInCheck(
@@ -272,17 +290,19 @@ data class Board(
         )
         if (kingInCheck) return false
 
-        val kingsValidMoves = findValidMoves(
-            board = this,
-            coordinates = kingSquare.coordinates
-        )
-        if (kingsValidMoves.isNotEmpty()) return false
-
-        val validMoves = findAllValidMovesByColor(
-            board = this,
-            color = color
-        )
-        return validMoves.isEmpty()
+        val atLeastOneValidMove = squareMap
+            .values
+            .filter { square ->
+                square.piece?.color == color
+            }
+            .any { square ->
+                findValidMoves(
+                    board = this,
+                    coordinates = square.coordinates,
+                    checkForStalemate = false,
+                ).isNotEmpty()
+            }
+        return !atLeastOneValidMove
     }
 
     companion object {
@@ -331,9 +351,17 @@ data class Board(
     }
 }
 
-fun findValidMoves(board: Board, coordinates: Coordinates): Set<Coordinates> =
+fun findValidMoves(
+    board: Board,
+    coordinates: Coordinates,
+    checkForStalemate: Boolean = true,
+): Set<Coordinates> =
     board.getPieceOrNull(coordinates)!!
-        .findMoveToCoordinates(board, coordinates)
+        .findMoveToCoordinates(
+            board = board,
+            fromCoordinates = coordinates,
+            checkForStalemate = checkForStalemate,
+        )
 
 fun findAllValidMovesByColor(board: Board, color: PieceColor): Set<Move> =
     board.squareMap
@@ -344,7 +372,8 @@ fun findAllValidMovesByColor(board: Board, color: PieceColor): Set<Move> =
         .flatMap { square ->
             findValidMoves(
                 board = board,
-                coordinates = square.coordinates
+                coordinates = square.coordinates,
+                checkForStalemate = false
             ).map { toCoordinates ->
                 Move(
                     from = square.coordinates,

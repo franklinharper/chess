@@ -121,7 +121,11 @@ class BishopTest {
         )
         assertEquals(
             expected = emptySet(),
-            actual = findValidMoves(board = board, coordinates = Coordinates(col = 0, row = 1))
+            actual = findValidMoves(
+                board = board,
+                coordinates = Coordinates(col = 0, row = 1),
+                checkForStalemate = false
+            )
         )
     }
 
@@ -138,7 +142,11 @@ class BishopTest {
         )
         assertEquals(
             expected = setOf(Coordinates(col = 0, row = 1)),
-            actual = findValidMoves(board = board, coordinates = Coordinates(col = 1, row = 0))
+            actual = findValidMoves(
+                board = board,
+                coordinates = Coordinates(col = 1, row = 0),
+                checkForStalemate = false
+            )
         )
     }
 
@@ -155,7 +163,11 @@ class BishopTest {
         )
         assertEquals(
             expected = setOf(Coordinates(col = 0, row = 2)),
-            actual = findValidMoves(board = board, coordinates = Coordinates(col = 2, row = 0))
+            actual = findValidMoves(
+                board = board,
+                coordinates = Coordinates(col = 2, row = 0),
+                checkForStalemate = false
+            )
         )
     }
 }

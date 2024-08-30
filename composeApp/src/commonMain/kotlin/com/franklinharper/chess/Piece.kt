@@ -47,6 +47,7 @@ sealed class Piece {
     abstract fun findMoveToCoordinates(
         board: Board,
         fromCoordinates: Coordinates,
+        checkForStalemate: Boolean = true,
     ): Set<Coordinates>
 
     abstract val color: PieceColor
@@ -66,12 +67,37 @@ sealed class Piece {
         override fun findMoveToCoordinates(
             board: Board,
             fromCoordinates: Coordinates,
+            checkForStalemate: Boolean,
         ): Set<Coordinates> {
             val possibleMoves = mutableSetOf<Coordinates>()
-            possibleMoves.addAll(rowLeft(board, fromCoordinates))
-            possibleMoves.addAll(rowRight(board, fromCoordinates))
-            possibleMoves.addAll(colUp(board, fromCoordinates))
-            possibleMoves.addAll(colDown(board, fromCoordinates))
+            possibleMoves.addAll(
+                rowLeft(
+                    board = board,
+                    fromCoordinates = fromCoordinates,
+                    checkForStalemate = checkForStalemate
+                )
+            )
+            possibleMoves.addAll(
+                rowRight(
+                    board = board,
+                    initialCoordinates = fromCoordinates,
+                    checkForStalemate = checkForStalemate
+                )
+            )
+            possibleMoves.addAll(
+                colUp(
+                    board = board,
+                    initialCoordinates = fromCoordinates,
+                    checkForStalemate = checkForStalemate
+                ),
+            )
+            possibleMoves.addAll(
+                colDown(
+                    board = board,
+                    initialCoordinates = fromCoordinates,
+                    checkForStalemate = checkForStalemate
+                ),
+            )
             return possibleMoves
         }
 
@@ -105,10 +131,12 @@ sealed class Piece {
         override fun findMoveToCoordinates(
             board: Board,
             fromCoordinates: Coordinates,
+            checkForStalemate: Boolean,
         ): Set<Coordinates> = findPossibleMovesByOffsets(
             board = board,
             sourceCoordinates = fromCoordinates,
-            offsets = offsets
+            offsets = offsets,
+            checkForStalemate = checkForStalemate,
         )
 
         override fun copy(hasMoved: Boolean) = Knight(this.color, hasMoved)
@@ -121,12 +149,29 @@ sealed class Piece {
         override fun findMoveToCoordinates(
             board: Board,
             fromCoordinates: Coordinates,
+            checkForStalemate: Boolean,
         ): Set<Coordinates> {
             val possibleMoves = mutableSetOf<Coordinates>()
-            possibleMoves.addAll(upperLeftDiagonal(board, fromCoordinates))
-            possibleMoves.addAll(upperRightDiagonal(board, fromCoordinates))
-            possibleMoves.addAll(lowerLeftDiagonal(board, fromCoordinates))
-            possibleMoves.addAll(lowerRightDiagonal(board, fromCoordinates))
+            possibleMoves.addAll(upperLeftDiagonal(
+                board = board,
+                initialCoordinates = fromCoordinates,
+                checkForStalemate = checkForStalemate,
+            ))
+            possibleMoves.addAll(upperRightDiagonal(
+                board = board,
+                initialCoordinates = fromCoordinates,
+                checkForStalemate = checkForStalemate,
+            ))
+            possibleMoves.addAll(lowerLeftDiagonal(
+                board = board,
+                initialCoordinates = fromCoordinates,
+                checkForStalemate = checkForStalemate,
+            ))
+            possibleMoves.addAll(lowerRightDiagonal(
+                board = board,
+                initialCoordinates = fromCoordinates,
+                checkForStalemate = checkForStalemate,
+            ))
             return possibleMoves
         }
 
@@ -180,6 +225,7 @@ sealed class Piece {
         override fun findMoveToCoordinates(
             board: Board,
             fromCoordinates: Coordinates,
+            checkForStalemate: Boolean,
         ): Set<Coordinates> {
             val king = board.getPieceOrNull(fromCoordinates)
             require(king is King)
@@ -261,20 +307,53 @@ sealed class Piece {
         override fun findMoveToCoordinates(
             board: Board,
             fromCoordinates: Coordinates,
+            checkForStalemate: Boolean,
         ): Set<Coordinates> {
             val possibleMoves = mutableSetOf<Coordinates>()
 
             // Diagonals
-            possibleMoves.addAll(upperLeftDiagonal(board, fromCoordinates))
-            possibleMoves.addAll(upperRightDiagonal(board, fromCoordinates))
-            possibleMoves.addAll(lowerLeftDiagonal(board, fromCoordinates))
-            possibleMoves.addAll(lowerRightDiagonal(board, fromCoordinates))
+            possibleMoves.addAll(upperLeftDiagonal(
+                board = board,
+                initialCoordinates = fromCoordinates,
+                checkForStalemate = checkForStalemate,
+            ))
+            possibleMoves.addAll(upperRightDiagonal(
+                board = board,
+                initialCoordinates = fromCoordinates,
+                checkForStalemate = checkForStalemate,
+            ))
+            possibleMoves.addAll(lowerLeftDiagonal(
+                board = board,
+                initialCoordinates = fromCoordinates,
+                checkForStalemate,
+            ))
+            possibleMoves.addAll(lowerRightDiagonal(
+                board = board,
+                initialCoordinates = fromCoordinates,
+                checkForStalemate = checkForStalemate,
+            ))
 
             // Rows and Columns
-            possibleMoves.addAll(rowLeft(board, fromCoordinates))
-            possibleMoves.addAll(rowRight(board, fromCoordinates))
-            possibleMoves.addAll(colUp(board, fromCoordinates))
-            possibleMoves.addAll(colDown(board, fromCoordinates))
+            possibleMoves.addAll(rowLeft(
+                board = board,
+                fromCoordinates = fromCoordinates,
+                checkForStalemate = checkForStalemate
+            ))
+            possibleMoves.addAll(rowRight(
+                board = board,
+                initialCoordinates = fromCoordinates,
+                checkForStalemate = checkForStalemate
+            ))
+            possibleMoves.addAll(colUp(
+                board = board,
+                initialCoordinates = fromCoordinates,
+                checkForStalemate = checkForStalemate
+            ))
+            possibleMoves.addAll(colDown(
+                board,
+                fromCoordinates,
+                checkForStalemate = checkForStalemate,
+            ))
             return possibleMoves
         }
 
@@ -290,6 +369,7 @@ sealed class Piece {
         override fun findMoveToCoordinates(
             board: Board,
             fromCoordinates: Coordinates,
+            checkForStalemate: Boolean,
         ): Set<Coordinates> {
             // Capture Moves
             val captureOffsets = if (color == White) whiteCaptureOffsets else blackCaptureOffsets
@@ -352,7 +432,12 @@ sealed class Piece {
                             enPassantRight
                     )
                 .filter { coordinates ->
-                    kingIsNotInCheckAfterMove(board, fromCoordinates, coordinates)
+                    kingIsNotInCheckAfterMove(
+                        board = board,
+                        from = fromCoordinates,
+                        to = coordinates,
+                        checkForStalemate = checkForStalemate
+                    )
                 }
                 .toSet()
         }
@@ -387,6 +472,7 @@ sealed class Piece {
         board: Board,
         sourceCoordinates: Coordinates,
         offsets: Set<Pair<Int, Int>>,
+        checkForStalemate: Boolean,
     ): Set<Coordinates> {
         val enemyPieceColor = board.getPieceOrNull(sourceCoordinates)?.color?.enemyColor()
         return offsets.mapNotNull {
@@ -399,9 +485,10 @@ sealed class Piece {
             (destinationSquare.isEmpty() || destinationSquare.piece!!.color == enemyPieceColor)
         }.filter { destinationSquare ->
             kingIsNotInCheckAfterMove(
-                board,
-                sourceCoordinates,
-                destinationSquare.coordinates
+                board = board,
+                from = sourceCoordinates,
+                to = destinationSquare.coordinates,
+                checkForStalemate = checkForStalemate
             )
         }.map { square ->
             square.coordinates
@@ -412,10 +499,12 @@ sealed class Piece {
         board: Board,
         from: Coordinates,
         to: Coordinates,
+        checkForStalemate: Boolean,
     ): Boolean {
         val newBoard = board.move(
             from = from,
-            to = to
+            to = to,
+            checkForStalemate = checkForStalemate
         )
         val king = newBoard.getKingSquare(color)
         return !squareCanBeAttacked(
@@ -425,83 +514,108 @@ sealed class Piece {
         )
     }
 
-    internal fun rowLeft(board: Board, initialCoordinates: Coordinates): Collection<Coordinates> =
+    internal fun rowLeft(
+        board: Board,
+        fromCoordinates: Coordinates,
+        checkForStalemate: Boolean,
+    ): Collection<Coordinates> =
         findPossibleMoveCoordinates(
             board = board,
-            initialCoordinates = initialCoordinates,
+            initialCoordinates = fromCoordinates,
             colDelta = -1,
             rowDelta = 0,
+            checkForStalemate = checkForStalemate,
         )
 
-    internal fun rowRight(board: Board, initialCoordinates: Coordinates): Collection<Coordinates> =
+    internal fun rowRight(
+        board: Board,
+        initialCoordinates: Coordinates,
+        checkForStalemate: Boolean,
+    ): Collection<Coordinates> =
         findPossibleMoveCoordinates(
             board = board,
             initialCoordinates = initialCoordinates,
             colDelta = 1,
             rowDelta = 0,
+            checkForStalemate = checkForStalemate,
         )
 
-    internal fun colUp(board: Board, initialCoordinates: Coordinates): Collection<Coordinates> =
+    internal fun colUp(
+        board: Board,
+        initialCoordinates: Coordinates,
+        checkForStalemate: Boolean,
+    ): Collection<Coordinates> =
         findPossibleMoveCoordinates(
             board = board,
             initialCoordinates = initialCoordinates,
             colDelta = 0,
             rowDelta = -1,
+            checkForStalemate = checkForStalemate,
         )
 
     internal fun colDown(
         board: Board,
         initialCoordinates: Coordinates,
+        checkForStalemate: Boolean,
     ): Collection<Coordinates> =
         findPossibleMoveCoordinates(
             board = board,
             initialCoordinates = initialCoordinates,
             colDelta = 0,
             rowDelta = 1,
+            checkForStalemate = checkForStalemate,
         )
 
     internal fun upperLeftDiagonal(
         board: Board,
         initialCoordinates: Coordinates,
+        checkForStalemate: Boolean,
     ): Collection<Coordinates> =
         findPossibleMoveCoordinates(
             board = board,
             initialCoordinates = initialCoordinates,
             colDelta = -1,
             rowDelta = -1,
+            checkForStalemate = checkForStalemate,
         )
 
     internal fun upperRightDiagonal(
         board: Board,
         initialCoordinates: Coordinates,
+        checkForStalemate: Boolean,
     ): Collection<Coordinates> =
         findPossibleMoveCoordinates(
             board = board,
             initialCoordinates = initialCoordinates,
             colDelta = 1,
             rowDelta = -1,
+            checkForStalemate = checkForStalemate,
         )
 
     internal fun lowerRightDiagonal(
         board: Board,
         initialCoordinates: Coordinates,
+        checkForStalemate: Boolean,
     ): Collection<Coordinates> =
         findPossibleMoveCoordinates(
             board = board,
             initialCoordinates = initialCoordinates,
             colDelta = 1,
             rowDelta = 1,
+            checkForStalemate = checkForStalemate,
         )
 
     internal fun lowerLeftDiagonal(
         board: Board,
         initialCoordinates: Coordinates,
+        checkForStalemate: Boolean,
     ): Collection<Coordinates> =
         findPossibleMoveCoordinates(
             board = board,
             initialCoordinates = initialCoordinates,
             colDelta = -1,
             rowDelta = 1,
+            checkForStalemate = checkForStalemate,
         )
 
     // Find possible moves, in a given direction, for pieces that can't jump over other pieces. I.e. not Knights.
@@ -511,6 +625,7 @@ sealed class Piece {
         initialCoordinates: Coordinates,
         colDelta: Int,
         rowDelta: Int,
+        checkForStalemate: Boolean,
     ): Collection<Coordinates> {
         require(colDelta != 0 || rowDelta != 0)
 
@@ -529,7 +644,8 @@ sealed class Piece {
                     if (kingIsNotInCheckAfterMove(
                             board = board,
                             from = initialCoordinates,
-                            to = toCoordinates
+                            to = toCoordinates,
+                            checkForStalemate = checkForStalemate,
                         )
                     ) {
                         possibleMoves.add(toCoordinates)
@@ -541,7 +657,8 @@ sealed class Piece {
                     if (kingIsNotInCheckAfterMove(
                             board = board,
                             from = initialCoordinates,
-                            to = toCoordinates
+                            to = toCoordinates,
+                            checkForStalemate = checkForStalemate,
                         )
                     ) {
                         possibleMoves.add(toCoordinates)

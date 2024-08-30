@@ -34,7 +34,11 @@ class PawnTest {
                 Coordinates(col = 4, row = 5),
                 Coordinates(col = 4, row = 4)
             ),
-            actual = findValidMoves(board = board, coordinates = Coordinates(col = 4, row = 6)),
+            actual = findValidMoves(
+                board = board,
+                coordinates = Coordinates(col = 4, row = 6),
+                checkForStalemate = false
+            ),
         )
         assertEquals(
             message = "Black pawn moves",
@@ -42,7 +46,11 @@ class PawnTest {
                 Coordinates(col = 4, row = 2),
                 Coordinates(col = 4, row = 3)
             ),
-            actual = findValidMoves(board = board, coordinates = Coordinates(col = 4, row = 1)),
+            actual = findValidMoves(
+                board = board,
+                coordinates = Coordinates(col = 4, row = 1),
+                checkForStalemate = false
+            ),
         )
     }
 
@@ -104,14 +112,22 @@ class PawnTest {
             expected = setOf(
                 Coordinates(col = 4, row = 4)
             ),
-            actual = findValidMoves(board = board, coordinates = Coordinates(col = 4, row = 5)),
+            actual = findValidMoves(
+                board = board,
+                coordinates = Coordinates(col = 4, row = 5),
+                checkForStalemate = false
+            ),
         )
         assertEquals(
             message = "Black pawn moves",
             expected = setOf(
                 Coordinates(col = 4, row = 3)
             ),
-            actual = findValidMoves(board = board, coordinates = Coordinates(col = 4, row = 2)),
+            actual = findValidMoves(
+                board = board,
+                coordinates = Coordinates(col = 4, row = 2),
+                checkForStalemate = false
+            ),
         )
     }
 
@@ -145,12 +161,20 @@ class PawnTest {
         assertEquals(
             message = "White pawn moves",
             expected = emptySet(),
-            actual = findValidMoves(board = board, coordinates = Coordinates(col = 4, row = 6)),
+            actual = findValidMoves(
+                board = board,
+                coordinates = Coordinates(col = 4, row = 6),
+                checkForStalemate = false
+            ),
         )
         assertEquals(
             message = "Black pawn moves",
             expected = emptySet(),
-            actual = findValidMoves(board = board, coordinates = Coordinates(col = 4, row = 1)),
+            actual = findValidMoves(
+                board = board,
+                coordinates = Coordinates(col = 4, row = 1),
+                checkForStalemate = false
+            ),
         )
     }
 
@@ -184,12 +208,20 @@ class PawnTest {
         assertEquals(
             message = "White pawn moves",
             expected = setOf(Coordinates(col = 4, row = 5)),
-            actual = findValidMoves(board = board, coordinates = Coordinates(col = 4, row = 6)),
+            actual = findValidMoves(
+                board = board,
+                coordinates = Coordinates(col = 4, row = 6),
+                checkForStalemate = false
+            ),
         )
         assertEquals(
             message = "Black pawn moves",
             expected = setOf(Coordinates(col = 4, row = 2)),
-            actual = findValidMoves(board = board, coordinates = Coordinates(col = 4, row = 1)),
+            actual = findValidMoves(
+                board = board,
+                coordinates = Coordinates(col = 4, row = 1),
+                checkForStalemate = false
+            ),
         )
     }
 
@@ -223,12 +255,20 @@ class PawnTest {
         assertEquals(
             message = "White pawn moves",
             expected = emptySet(),
-            actual = findValidMoves(board = board, coordinates = Coordinates(col = 4, row = 6)),
+            actual = findValidMoves(
+                board = board,
+                coordinates = Coordinates(col = 4, row = 6),
+                checkForStalemate = false
+            ),
         )
         assertEquals(
             message = "Black pawn moves",
             expected = emptySet(),
-            actual = findValidMoves(board = board, coordinates = Coordinates(col = 4, row = 1)),
+            actual = findValidMoves(
+                board = board,
+                coordinates = Coordinates(col = 4, row = 1),
+                checkForStalemate = false
+            ),
         )
     }
 
@@ -268,7 +308,8 @@ class PawnTest {
             ),
             actual = findValidMoves(
                 board = board,
-                coordinates = Coordinates(col = 4, row = 1)
+                coordinates = Coordinates(col = 4, row = 1),
+                checkForStalemate = false
             ),
         )
     }
@@ -308,7 +349,8 @@ class PawnTest {
             ),
             actual = findValidMoves(
                 board = board,
-                coordinates = Coordinates(col = 4, row = 6)
+                coordinates = Coordinates(col = 4, row = 6),
+                checkForStalemate = false
             ),
         )
     }
@@ -335,7 +377,8 @@ class PawnTest {
             expected = emptySet(),
             actual = findValidMoves(
                 board = board,
-                coordinates = Coordinates(col = 0, row = 1)
+                coordinates = Coordinates(col = 0, row = 1),
+                checkForStalemate = false
             ),
         )
     }
@@ -362,7 +405,8 @@ class PawnTest {
             expected = emptySet(),
             actual = findValidMoves(
                 board = board,
-                coordinates = Coordinates(col = 3, row = 1)
+                coordinates = Coordinates(col = 3, row = 1),
+                checkForStalemate = false
             ),
         )
     }
@@ -389,7 +433,8 @@ class PawnTest {
             expected = setOf(Coordinates(col = 2, row = 2)),
             actual = findValidMoves(
                 board = board,
-                coordinates = Coordinates(col = 3, row = 1)
+                coordinates = Coordinates(col = 3, row = 1),
+                checkForStalemate = false
             ),
         )
     }
@@ -416,7 +461,8 @@ class PawnTest {
             expected = setOf(Coordinates(col = 3, row = 2)),
             actual = findValidMoves(
                 board = board,
-                coordinates = Coordinates(col = 3, row = 1)
+                coordinates = Coordinates(col = 3, row = 1),
+                checkForStalemate = false
             ),
         )
     }
@@ -459,7 +505,8 @@ class PawnTest {
             ),
             actual = findValidMoves(
                 board = enPassantLeftPossibleBoard,
-                coordinates = Coordinates(col = 5, row = 3)
+                coordinates = Coordinates(col = 5, row = 3),
+                checkForStalemate = false
             ),
         )
         val afterEnPassantLeftBoard = enPassantLeftPossibleBoard
@@ -494,7 +541,8 @@ class PawnTest {
             ),
             actual = findValidMoves(
                 board = enPassantRightPossibleBoard,
-                coordinates = Coordinates(col = 5, row = 3)
+                coordinates = Coordinates(col = 5, row = 3),
+                checkForStalemate = false
             ),
         )
         val afterEnPassantRightBoard = enPassantRightPossibleBoard
@@ -557,7 +605,8 @@ class PawnTest {
             ),
             actual = findValidMoves(
                 board = enPassantLeftPossibleBoard,
-                coordinates = Coordinates(col = 5, row = 4)
+                coordinates = Coordinates(col = 5, row = 4),
+                checkForStalemate = false
             ),
         )
         val afterEnPassantLeftBoard = enPassantLeftPossibleBoard
@@ -593,7 +642,8 @@ class PawnTest {
             ),
             actual = findValidMoves(
                 board = enPassantRightPossibleBoard,
-                coordinates = Coordinates(col = 5, row = 4)
+                coordinates = Coordinates(col = 5, row = 4),
+                checkForStalemate = false
             ),
         )
         val afterEnPassantRightBoard = enPassantRightPossibleBoard
@@ -653,7 +703,8 @@ class PawnTest {
             ),
             actual = findValidMoves(
                 board = board,
-                coordinates = Coordinates(col = 5, row = 4)
+                coordinates = Coordinates(col = 5, row = 4),
+                checkForStalemate = false
             ),
         )
     }

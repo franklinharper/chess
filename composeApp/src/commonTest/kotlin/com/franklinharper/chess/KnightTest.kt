@@ -1,7 +1,6 @@
 package com.franklinharper.chess
 
 import com.franklinharper.chess.Piece.*
-import com.franklinharper.chess.Piece.Companion.blackKingInitialCoordinates
 import com.franklinharper.chess.Piece.Companion.whiteKingInitialCoordinates
 import com.franklinharper.chess.PieceColor.*
 import kotlin.test.Test
@@ -37,7 +36,11 @@ class KnightTest {
                 // Below
                 Coordinates(col = 1, row = 4), Coordinates(col = 3, row = 4),
             ),
-            actual = findValidMoves(board = board, coordinates = Coordinates(col = 2, row = 2))
+            actual = findValidMoves(
+                board = board,
+                coordinates = Coordinates(col = 2, row = 2),
+                checkForStalemate = false
+            )
         )
     }
 
@@ -61,7 +64,11 @@ class KnightTest {
                 Coordinates(col = 2, row = 2),
                 Coordinates(col = 2, row = 0),
             ),
-            actual = findValidMoves(board = board, coordinates = Coordinates(col = 0, row = 1))
+            actual = findValidMoves(
+                board = board,
+                coordinates = Coordinates(col = 0, row = 1),
+                checkForStalemate = false
+            )
         )
     }
 
@@ -89,7 +96,11 @@ class KnightTest {
                 Coordinates(col = 2, row = 2),
                 Coordinates(col = 2, row = 0),
             ),
-            actual = findValidMoves(board = board, coordinates = Coordinates(col = 0, row = 1))
+            actual = findValidMoves(
+                board = board,
+                coordinates = Coordinates(col = 0, row = 1),
+                checkForStalemate = false
+            )
         )
     }
 
@@ -105,7 +116,11 @@ class KnightTest {
         )
         assertEquals(
             expected = emptySet(),
-            actual = findValidMoves(board = board, coordinates = Coordinates(col = 0, row = 0))
+            actual = findValidMoves(
+                board = board,
+                coordinates = Coordinates(col = 0, row = 0),
+                checkForStalemate = false
+            )
         )
     }
 
@@ -122,7 +137,11 @@ class KnightTest {
         )
         assertEquals(
             expected = emptySet(),
-            actual = findValidMoves(board = board, coordinates = Coordinates(col = 0, row = 1))
+            actual = findValidMoves(
+                board = board,
+                coordinates = Coordinates(col = 0, row = 1),
+                checkForStalemate = false
+            )
         )
     }
 
@@ -139,7 +158,11 @@ class KnightTest {
         )
         assertEquals(
             expected = setOf(Coordinates(col = 0, row = 1)),
-            actual = findValidMoves(board = board, coordinates = Coordinates(col = 2, row = 0))
+            actual = findValidMoves(
+                board = board,
+                coordinates = Coordinates(col = 2, row = 0),
+                checkForStalemate = false
+            )
         )
     }
 
@@ -156,7 +179,11 @@ class KnightTest {
         )
         assertEquals(
             expected = setOf(Coordinates(col = 0, row = 2)),
-            actual = findValidMoves(board = board, coordinates = Coordinates(col = 1, row = 0))
+            actual = findValidMoves(
+                board = board,
+                coordinates = Coordinates(col = 1, row = 0),
+                checkForStalemate = false
+            )
         )
     }
 
@@ -183,7 +210,11 @@ class KnightTest {
                 Coordinates(col = 7, row = 6),
                 Coordinates(col = 6, row = 7),
             ),
-            actual = findValidMoves(board = board, coordinates = Coordinates(col = 5, row = 5))
+            actual = findValidMoves(
+                board = board,
+                coordinates = Coordinates(col = 5, row = 5),
+                checkForStalemate = false
+            )
         )
     }
 
@@ -202,7 +233,8 @@ class KnightTest {
             expected = emptySet(),
             actual = findValidMoves(
                 board = board,
-                coordinates = Coordinates(col = 6, row = 1)
+                coordinates = Coordinates(col = 6, row = 1),
+                checkForStalemate = false
             )
         )
     }
