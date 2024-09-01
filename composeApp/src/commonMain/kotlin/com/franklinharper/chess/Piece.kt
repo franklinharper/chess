@@ -227,10 +227,13 @@ sealed class Piece {
             fromCoordinates: Coordinates,
             checkForStalemate: Boolean,
         ): Set<Coordinates> {
-            val king = board.getPieceOrNull(fromCoordinates)
-            require(king is King)
+            val king = board.getPieceOrNull(fromCoordinates) as King
 
             val enemyColor = king.color.enemyColor()
+
+            // Temporarily remove the King from the board so that we can simulate it's movement
+            // to a new square.
+            val boardWithoutKing = board.removePiece(from = fromCoordinates)
 
             val normalMoves = Board.neighborOffsets.mapNotNull {
                 val offsetCoordinates = Coordinates(
@@ -238,16 +241,15 @@ sealed class Piece {
                     row = fromCoordinates.row + it.second,
                 )
                 board.getSquareOrNull(offsetCoordinates)
-            }.filter { destinationSquare ->
-                val destinationPiece = board.getPieceOrNull(destinationSquare.coordinates)
-                val destinationSquareIsEmptyOrEnemy =
-                    destinationPiece == null || destinationPiece.color == enemyColor
-                val isUnderAttack = squareCanBeAttacked(
-                    board = board,
+            }.filter { toSquare ->
+                val toPiece = board.getPieceOrNull(toSquare.coordinates)
+                val toSquareContainsFriendlyPiece = toPiece?.color == king.color
+                val isNotUnderAttack = !squareCanBeAttacked(
+                    board = boardWithoutKing,
                     attackingColor = enemyColor,
-                    coordinates = destinationSquare.coordinates,
+                    coordinates = toSquare.coordinates,
                 )
-                destinationSquareIsEmptyOrEnemy && !isUnderAttack
+                !toSquareContainsFriendlyPiece && isNotUnderAttack
             }.map { square ->
                 square.coordinates
             }.toSet()

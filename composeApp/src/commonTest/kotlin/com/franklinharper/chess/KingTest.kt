@@ -426,11 +426,14 @@ class KingTest {
     fun testBlackCastlingIsNotPossibleWhenAnIntermediateSquareIsOccupied2() {
         val board = Board(
             setOf(
+                // Black
                 Square(piece = Rook(Black), coordinates = blackQueensideRookInitialCoordinates),
                 Square(piece = Bishop(Black), coordinates = Coordinates(col = 2, row = 0)),
                 Square(piece = King(Black), coordinates = blackKingInitialCoordinates),
                 Square(piece = Bishop(Black), coordinates = Coordinates(col = 5, row = 0)),
                 Square(piece = Rook(Black), coordinates = blackKingsideRookInitialCoordinates),
+                // White
+                Square(piece = King(White), coordinates = whiteKingInitialCoordinates),
             )
         )
         val actual = findValidMoves(
@@ -539,8 +542,27 @@ class KingTest {
                 Square(piece = King(White, hasMoved = true), coordinates = Coordinates(col = 4, row = 2))
             ),
         )
-        assertFalse(board.isCheckmate(White))
-        assertTrue(board.isCheckmate(Black))
+        assertFalse(isCheckmate(board, White))
+        assertTrue(isCheckmate(board,Black))
+    }
+
+    @Test
+    fun testCheckmate2() {
+        val board = Board(
+            squares = setOf(
+                // Black
+                Square(piece = King(Black, hasMoved = false), coordinates = blackKingInitialCoordinates),
+                // White
+                Square(piece = Queen(White, hasMoved = true), coordinates = Coordinates(col = 6, row = 1)),
+                Square(piece = King(White, hasMoved = true), coordinates = Coordinates(col = 4, row = 2))
+            ),
+        )
+            .move(from = Coordinates(
+                col = 6,
+                row = 1
+            ), to = Coordinates(col = 6, row = 0))
+        assertFalse(isCheckmate(board, White))
+        assertTrue(isCheckmate(board, Black))
     }
 
     @Test
@@ -554,8 +576,8 @@ class KingTest {
                 Square(piece = King(White, hasMoved = true), coordinates = Coordinates(col = 4, row = 2)),
             ),
         )
-        assertFalse(board.isStalemate(White))
-        assertTrue(board.isStalemate(Black))
+        assertFalse(isStalemate(board, White))
+        assertTrue(isStalemate(board, Black))
     }
 
     @Test
@@ -571,7 +593,7 @@ class KingTest {
                 Square(piece = Bishop(White, hasMoved = true), coordinates = Coordinates(col = 7, row = 7)),
             ),
         )
-        assertFalse(board.isStalemate(White))
-//        assertTrue(board.isStalemate(Black))
+        assertFalse(isStalemate(board, White))
+        assertTrue(isStalemate(board, Black))
     }
 }

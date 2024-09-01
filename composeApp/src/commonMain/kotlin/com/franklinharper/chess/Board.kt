@@ -123,28 +123,31 @@ data class Board(
         to: Coordinates,
         checkForStalemate: Boolean = true,
     ): Board {
+        val fromPiece = getSquare(from).piece!!
+        val color = fromPiece.color
         val newMap = copyMapAndMakeMove(
+            fromPiece = fromPiece,
+            from = from,
             to = to,
-            from = from
         )
+        val newBoard = Board(squareMap = newMap, boardStatus = boardStatus)
         val newStatus = when {
-            isCheckmate(Black) -> WhiteWin
-            checkForStalemate && isStalemate(Black) -> Stalemate
-            isCheckmate(White) -> BlackWin
-            checkForStalemate && isStalemate(White) -> Stalemate
+            color == White && isCheckmate(board = newBoard, color = Black) -> WhiteWin
+            color == Black && isCheckmate(board = newBoard, color = White) -> BlackWin
+            checkForStalemate && isStalemate(board = newBoard, color = color.enemyColor()) -> Stalemate
             boardStatus == BlacksMove-> WhitesMove
             boardStatus == WhitesMove-> BlacksMove
-            else -> throw IllegalStateException("Invalid board status")
+            else -> throw IllegalStateException("Error calculating board status")
         }
         return Board(squareMap = newMap, boardStatus = newStatus)
     }
 
     private fun copyMapAndMakeMove(
-        to: Coordinates,
+        fromPiece: Piece,
         from: Coordinates,
+        to: Coordinates,
     ): Map<Coordinates, Square> {
         val mutableMap = squareMap.toMutableMap()
-        val fromPiece = mutableMap[from]?.piece!!
 
         // Ensure that none of the friendly pawn's twoSquareAdvanceOnPreviousMove flags are set.
         for (square in mutableMap.values) {
@@ -266,43 +269,12 @@ data class Board(
         return "moveColor=$boardStatus, squares=${squareMap.values})"
     }
 
-    fun isCheckmate(color: PieceColor): Boolean {
-        val kingSquare = getKingSquare(color)
-        val kingsValidMoves = findValidMoves(
-            board = this,
-            coordinates = kingSquare.coordinates,
-            checkForStalemate = false
-        )
-        val king = kingSquare.piece as King
-        val kingInCheck = king.isInCheck(
-            board = this,
-            kingCoordinates = kingSquare.coordinates
-        )
-        return kingInCheck && kingsValidMoves.isEmpty()
-    }
-
-    fun isStalemate(color: PieceColor): Boolean {
-        val kingSquare = getKingSquare(color)
-        val king = kingSquare.piece as King
-        val kingInCheck = king.isInCheck(
-            board = this,
-            kingCoordinates = kingSquare.coordinates
-        )
-        if (kingInCheck) return false
-
-        val atLeastOneValidMove = squareMap
-            .values
-            .filter { square ->
-                square.piece?.color == color
-            }
-            .any { square ->
-                findValidMoves(
-                    board = this,
-                    coordinates = square.coordinates,
-                    checkForStalemate = false,
-                ).isNotEmpty()
-            }
-        return !atLeastOneValidMove
+    fun removePiece(from: Coordinates): Board {
+        val mutableMap = squareMap.toMutableMap()
+        mutableMap.remove(from)
+        // The board status is not recalculated; which is a bug.
+        // TODO fix the bug by removing the boardSatus property from Board
+        return Board(squareMap = mutableMap, boardStatus = boardStatus)
     }
 
     companion object {
@@ -314,7 +286,7 @@ data class Board(
             ),
 
             Square(
-                piece = Pawn(Black, hasMoved = true),
+                piece = Pawn(Black, hasMoved = false),
                 coordinates = Coordinates(col = 0, row = 1)
             ),
 
@@ -681,3 +653,42 @@ private fun isUnderKingAttack(
     piece = King(enemyColor),
     offsets = Board.neighborOffsets
 )
+
+fun isCheckmate(board: Board, color: PieceColor): Boolean {
+    val kingSquare = board.getKingSquare(color)
+    val kingsValidMoves = findValidMoves(
+        board = board,
+        coordinates = kingSquare.coordinates,
+        checkForStalemate = false
+    )
+    val king = kingSquare.piece as King
+    val kingInCheck = king.isInCheck(
+        board = board,
+        kingCoordinates = kingSquare.coordinates
+    )
+    return kingInCheck && kingsValidMoves.isEmpty()
+}
+
+fun isStalemate(board: Board, color: PieceColor): Boolean {
+    val kingSquare = board.getKingSquare(color)
+    val king = kingSquare.piece as King
+    val kingInCheck = king.isInCheck(
+        board = board,
+        kingCoordinates = kingSquare.coordinates
+    )
+    if (kingInCheck) return false
+
+    val atLeastOneValidMove = board.squareMap
+        .values
+        .filter { square ->
+            square.piece?.color == color
+        }
+        .any { square ->
+            findValidMoves(
+                board = board,
+                coordinates = square.coordinates,
+                checkForStalemate = false,
+            ).isNotEmpty()
+        }
+    return !atLeastOneValidMove
+}
