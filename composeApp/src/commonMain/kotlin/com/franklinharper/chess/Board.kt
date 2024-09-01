@@ -31,45 +31,7 @@ data class Board(
     constructor() :
             this(
                 boardStatus = WhitesMove,
-                squares = setOf(
-                    // Black
-                    Square(piece = Rook(Black), coordinates = Coordinates(col = 0, row = 0)),
-                    Square(piece = Knight(Black), coordinates = Coordinates(col = 1, row = 0)),
-                    Square(piece = Bishop(Black), coordinates = Coordinates(col = 2, row = 0)),
-                    Square(piece = Queen(Black), coordinates = Coordinates(col = 3, row = 0)),
-                    Square(piece = King(Black), coordinates = blackKingInitialCoordinates),
-                    Square(piece = Bishop(Black), coordinates = Coordinates(col = 5, row = 0)),
-                    Square(piece = Knight(Black), coordinates = Coordinates(col = 6, row = 0)),
-                    Square(piece = Rook(Black), coordinates = Coordinates(col = 7, row = 0)),
-
-                    Square(piece = Pawn(Black), coordinates = Coordinates(col = 0, row = 1)),
-                    Square(piece = Pawn(Black), coordinates = Coordinates(col = 1, row = 1)),
-                    Square(piece = Pawn(Black), coordinates = Coordinates(col = 2, row = 1)),
-                    Square(piece = Pawn(Black), coordinates = Coordinates(col = 3, row = 1)),
-                    Square(piece = Pawn(Black), coordinates = Coordinates(col = 4, row = 1)),
-                    Square(piece = Pawn(Black), coordinates = Coordinates(col = 5, row = 1)),
-                    Square(piece = Pawn(Black), coordinates = Coordinates(col = 6, row = 1)),
-                    Square(piece = Pawn(Black), coordinates = Coordinates(col = 7, row = 1)),
-
-                    // White
-                    Square(piece = Pawn(White), coordinates = Coordinates(col = 0, row = 6)),
-                    Square(piece = Pawn(White), coordinates = Coordinates(col = 1, row = 6)),
-                    Square(piece = Pawn(White), coordinates = Coordinates(col = 2, row = 6)),
-                    Square(piece = Pawn(White), coordinates = Coordinates(col = 3, row = 6)),
-                    Square(piece = Pawn(White), coordinates = Coordinates(col = 4, row = 6)),
-                    Square(piece = Pawn(White), coordinates = Coordinates(col = 5, row = 6)),
-                    Square(piece = Pawn(White), coordinates = Coordinates(col = 6, row = 6)),
-                    Square(piece = Pawn(White), coordinates = Coordinates(col = 7, row = 6)),
-
-                    Square(piece = Rook(White), coordinates = Coordinates(col = 0, row = 7)),
-                    Square(piece = Knight(White), coordinates = Coordinates(col = 1, row = 7)),
-                    Square(piece = Bishop(White), coordinates = Coordinates(col = 2, row = 7)),
-                    Square(piece = Queen(White), coordinates = Coordinates(col = 3, row = 7)),
-                    Square(piece = King(White), coordinates = whiteKingInitialCoordinates),
-                    Square(piece = Bishop(White), coordinates = Coordinates(col = 5, row = 7)),
-                    Square(piece = Knight(White), coordinates = Coordinates(col = 6, row = 7)),
-                    Square(piece = Rook(White), coordinates = Coordinates(col = 7, row = 7)),
-                )
+                squares =  initialSetup,
             )
 
     // TODO write tests for this function?
@@ -278,6 +240,46 @@ data class Board(
     }
 
     companion object {
+
+        val initialSetup = setOf(
+        // Black
+        Square(piece = Rook(Black), coordinates = Coordinates(col = 0, row = 0)),
+        Square(piece = Knight(Black), coordinates = Coordinates(col = 1, row = 0)),
+        Square(piece = Bishop(Black), coordinates = Coordinates(col = 2, row = 0)),
+        Square(piece = Queen(Black), coordinates = Coordinates(col = 3, row = 0)),
+        Square(piece = King(Black), coordinates = blackKingInitialCoordinates),
+        Square(piece = Bishop(Black), coordinates = Coordinates(col = 5, row = 0)),
+        Square(piece = Knight(Black), coordinates = Coordinates(col = 6, row = 0)),
+        Square(piece = Rook(Black), coordinates = Coordinates(col = 7, row = 0)),
+
+        Square(piece = Pawn(Black), coordinates = Coordinates(col = 0, row = 1)),
+        Square(piece = Pawn(Black), coordinates = Coordinates(col = 1, row = 1)),
+        Square(piece = Pawn(Black), coordinates = Coordinates(col = 2, row = 1)),
+        Square(piece = Pawn(Black), coordinates = Coordinates(col = 3, row = 1)),
+        Square(piece = Pawn(Black), coordinates = Coordinates(col = 4, row = 1)),
+        Square(piece = Pawn(Black), coordinates = Coordinates(col = 5, row = 1)),
+        Square(piece = Pawn(Black), coordinates = Coordinates(col = 6, row = 1)),
+        Square(piece = Pawn(Black), coordinates = Coordinates(col = 7, row = 1)),
+
+        // White
+        Square(piece = Pawn(White), coordinates = Coordinates(col = 0, row = 6)),
+        Square(piece = Pawn(White), coordinates = Coordinates(col = 1, row = 6)),
+        Square(piece = Pawn(White), coordinates = Coordinates(col = 2, row = 6)),
+        Square(piece = Pawn(White), coordinates = Coordinates(col = 3, row = 6)),
+        Square(piece = Pawn(White), coordinates = Coordinates(col = 4, row = 6)),
+        Square(piece = Pawn(White), coordinates = Coordinates(col = 5, row = 6)),
+        Square(piece = Pawn(White), coordinates = Coordinates(col = 6, row = 6)),
+        Square(piece = Pawn(White), coordinates = Coordinates(col = 7, row = 6)),
+
+        Square(piece = Rook(White), coordinates = Coordinates(col = 0, row = 7)),
+        Square(piece = Knight(White), coordinates = Coordinates(col = 1, row = 7)),
+        Square(piece = Bishop(White), coordinates = Coordinates(col = 2, row = 7)),
+        Square(piece = Queen(White), coordinates = Coordinates(col = 3, row = 7)),
+        Square(piece = King(White), coordinates = whiteKingInitialCoordinates),
+        Square(piece = Bishop(White), coordinates = Coordinates(col = 5, row = 7)),
+        Square(piece = Knight(White), coordinates = Coordinates(col = 6, row = 7)),
+        Square(piece = Rook(White), coordinates = Coordinates(col = 7, row = 7)),
+        )
         val endGameSetupForTesting = setOf(
             // Black
             Square(

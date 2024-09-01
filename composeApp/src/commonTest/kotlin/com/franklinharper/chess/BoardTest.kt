@@ -2,6 +2,7 @@ package com.franklinharper.chess
 
 import com.franklinharper.chess.Piece.*
 import com.franklinharper.chess.Piece.Companion.blackKingInitialCoordinates
+import com.franklinharper.chess.Piece.Companion.whiteKingInitialCoordinates
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
@@ -336,9 +337,16 @@ class BoardTest {
         val board =
             Board(
                 setOf(
+                    // White
                     Square(
-                        piece = King(White, hasMoved = false),
+                        piece = King(White, hasMoved = true),
                         coordinates = Coordinates(col = 1, row = 1)
+                    ),
+
+                    // Black
+                    Square(
+                        piece = King(Black, hasMoved = false),
+                        coordinates = blackKingInitialCoordinates
                     ),
                 )
             )
@@ -367,6 +375,10 @@ class BoardTest {
                     Square(
                         piece = Queen(White, hasMoved = true),
                         coordinates = Coordinates(col = 4, row = 1)
+                    ),
+                    Square(
+                        piece = King(White, hasMoved = false),
+                        coordinates = whiteKingInitialCoordinates,
                     ),
                 )
             )
