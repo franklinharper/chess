@@ -6,30 +6,6 @@ import com.franklinharper.chess.PieceColor.White
 
 sealed class Piece {
 
-    companion object {
-        // Coordinates that are used frequently
-        //
-        // White Initial coordinates
-        val whiteKingInitialCoordinates = Coordinates(col = 4, row = 7)
-        val whiteQueenInitialCoordinates = Coordinates(col = 3, row = 7)
-        val whiteQueensideRookInitialCoordinates = Coordinates(col = 0, row = 7)
-        val whiteKingsideRookInitialCoordinates = Coordinates(col = 7, row = 7)
-
-        // White Castling coordinates
-        val whiteQueensideCastle = Coordinates(col = 2, row = 7)
-        val whiteKingsideCastle = Coordinates(col = 6, row = 7)
-
-        // Black Initial coordinates
-        val blackKingInitialCoordinates = Coordinates(col = 4, row = 0)
-        val blackQueenInitialCoordinates = Coordinates(col = 3, row = 0)
-        val blackQueensideRookInitialCoordinates = Coordinates(col = 0, row = 0)
-        val blackKingsideRookInitialCoordinates = Coordinates(col = 7, row = 0)
-
-        // Black Castling coordinates
-        val blackQueensideCastle = Coordinates(col = 2, row = 0)
-        val blackKingsideCastle = Coordinates(col = 6, row = 0)
-    }
-
     // For a given Square, return the moves that a piece can make.
     //
     // @param board Board
@@ -44,7 +20,7 @@ sealed class Piece {
     // Some possible attacks are not valid moves. An example of is when a piece is pinned.
     // A pinned piece has a set of possible attacks; but some won't be valid moves because they
     // would expose the King to an attack.
-    abstract fun findMoveToCoordinates(
+    abstract fun findValidToCoordinates(
         board: Board,
         fromCoordinates: Coordinates,
         checkForStalemate: Boolean = true,
@@ -64,7 +40,7 @@ sealed class Piece {
         override val color: PieceColor,
         override val hasMoved: Boolean = false,
     ) : Piece() {
-        override fun findMoveToCoordinates(
+        override fun findValidToCoordinates(
             board: Board,
             fromCoordinates: Coordinates,
             checkForStalemate: Boolean,
@@ -128,7 +104,7 @@ sealed class Piece {
             Pair(1, 2),
         )
 
-        override fun findMoveToCoordinates(
+        override fun findValidToCoordinates(
             board: Board,
             fromCoordinates: Coordinates,
             checkForStalemate: Boolean,
@@ -146,7 +122,7 @@ sealed class Piece {
         override val color: PieceColor,
         override val hasMoved: Boolean = false,
     ) : Piece() {
-        override fun findMoveToCoordinates(
+        override fun findValidToCoordinates(
             board: Board,
             fromCoordinates: Coordinates,
             checkForStalemate: Boolean,
@@ -222,7 +198,7 @@ sealed class Piece {
                     intermediateSquaresAreEmptyAndCannotBeAttacked
         }
 
-        override fun findMoveToCoordinates(
+        override fun findValidToCoordinates(
             board: Board,
             fromCoordinates: Coordinates,
             checkForStalemate: Boolean,
@@ -306,7 +282,7 @@ sealed class Piece {
         override val color: PieceColor,
         override val hasMoved: Boolean = false,
     ) : Piece() {
-        override fun findMoveToCoordinates(
+        override fun findValidToCoordinates(
             board: Board,
             fromCoordinates: Coordinates,
             checkForStalemate: Boolean,
@@ -368,7 +344,7 @@ sealed class Piece {
         val twoSquareAdvanceOnPreviousMove: Boolean = false,
     ) : Piece() {
 
-        override fun findMoveToCoordinates(
+        override fun findValidToCoordinates(
             board: Board,
             fromCoordinates: Coordinates,
             checkForStalemate: Boolean,
@@ -416,12 +392,12 @@ sealed class Piece {
                 twoSquareAdvanceSquare!!.isEmpty() -> setOf(twoSquareAdvanceCoordinates)
                 else -> emptySet() // A piece is on the square
             }
-            val enPassantLeft = enPassantMoveSet(
+            val enPassantLeft = candidateEnPassantMoveSet(
                 colDelta = -1,
                 board = board,
                 from = fromCoordinates
             )
-            val enPassantRight = enPassantMoveSet(
+            val enPassantRight = candidateEnPassantMoveSet(
                 colDelta = 1,
                 board = board,
                 from = fromCoordinates
@@ -444,7 +420,7 @@ sealed class Piece {
                 .toSet()
         }
 
-        private fun enPassantMoveSet(
+        private fun candidateEnPassantMoveSet(
             board: Board,
             from: Coordinates,
             colDelta: Int,
@@ -477,6 +453,7 @@ sealed class Piece {
         checkForStalemate: Boolean,
     ): Set<Coordinates> {
         val enemyPieceColor = board.getPieceOrNull(sourceCoordinates)?.color?.enemyColor()
+        // It isn't worth using a Sequence here, because the collections are always small.
         return offsets.mapNotNull {
             val offsetCoordinates = Coordinates(
                 col = sourceCoordinates.col + it.first,
@@ -677,4 +654,29 @@ sealed class Piece {
         delta == 0 -> 0
         else -> -1
     }
+
+    companion object {
+        // Coordinates that are used frequently
+        //
+        // White Initial coordinates
+        val whiteKingInitialCoordinates = Coordinates(col = 4, row = 7)
+        val whiteQueenInitialCoordinates = Coordinates(col = 3, row = 7)
+        val whiteQueensideRookInitialCoordinates = Coordinates(col = 0, row = 7)
+        val whiteKingsideRookInitialCoordinates = Coordinates(col = 7, row = 7)
+
+        // White Castling coordinates
+        val whiteQueensideCastle = Coordinates(col = 2, row = 7)
+        val whiteKingsideCastle = Coordinates(col = 6, row = 7)
+
+        // Black Initial coordinates
+        val blackKingInitialCoordinates = Coordinates(col = 4, row = 0)
+        val blackQueenInitialCoordinates = Coordinates(col = 3, row = 0)
+        val blackQueensideRookInitialCoordinates = Coordinates(col = 0, row = 0)
+        val blackKingsideRookInitialCoordinates = Coordinates(col = 7, row = 0)
+
+        // Black Castling coordinates
+        val blackQueensideCastle = Coordinates(col = 2, row = 0)
+        val blackKingsideCastle = Coordinates(col = 6, row = 0)
+    }
+
 }

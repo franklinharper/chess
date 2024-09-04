@@ -136,6 +136,9 @@ data class Board(
         }
         mutableMap.remove(key = from)
         mutableMap[to] = Square(piece = movedPiece, coordinates = to)
+
+        // Check if this move requires moving other pieces.
+
         // En passant
         val isEnPassant = movedPiece is Pawn && getPieceOrNull(to) == null
         if (isEnPassant) {
@@ -143,6 +146,7 @@ data class Board(
             val enemyPawnCoordinates = to.copy(row = to.row + rowOffset)
             mutableMap.remove(enemyPawnCoordinates)
         }
+
         // Castling
         val isCastling = movedPiece is King && abs(to.col - from.col) == 2
         if (isCastling) {
@@ -331,7 +335,7 @@ fun findValidMoves(
     checkForStalemate: Boolean = true,
 ): Set<Coordinates> =
     board.getPieceOrNull(coordinates)!!
-        .findMoveToCoordinates(
+        .findValidToCoordinates(
             board = board,
             fromCoordinates = coordinates,
             checkForStalemate = checkForStalemate,
@@ -357,90 +361,6 @@ fun findAllValidMovesByColor(board: Board, color: PieceColor): Set<Move> =
         }
         .toSet()
 
-//    //    private val squares: Array<Array<Square>> = arrayOf(
-//    //        arrayOf(
-//    //            Square(Piece.Rook(PieceColor.Black), Coordinates(col = 0, row = 0)),
-//    //            Square(Piece.Knight(PieceColor.Black), Coordinates(col = 1, row = 0)),
-//    //            Square(Piece.Bishop(PieceColor.Black),  Coordinates(col = 2, row = 0)),
-//    //            Square(Piece.King(PieceColor.Black),  Coordinates(col = 3, row = 0)),
-//    //            Square(Piece.Queen(PieceColor.Black),  Coordinates(col = 4, row = 0)),
-//    //            Square(Piece.Bishop(PieceColor.Black),  Coordinates(col = 5, row = 0)),
-//    //            Square(Piece.Knight(PieceColor.Black),  Coordinates(col = 6, row = 0)),
-//    //            Square(Piece.Rook(PieceColor.Black),  Coordinates(col = 7, row = 0)),
-//    //        ),
-//    //        arrayOf(
-//    //            Square(Piece.Pawn(PieceColor.Black)),
-//    //            Square(Piece.Pawn(PieceColor.Black)),
-//    //            Square(Piece.Pawn(PieceColor.Black)),
-//    //            Square(Piece.Pawn(PieceColor.Black)),
-//    //            Square(Piece.Pawn(PieceColor.Black)),
-//    //            Square(Piece.Pawn(PieceColor.Black)),
-//    //            Square(Piece.Pawn(PieceColor.Black)),
-//    //            Square(Piece.Pawn(PieceColor.Black)),
-//    //        ),
-//    //        arrayOf(
-//    //            Square(piece = null), Square(piece = null), Square(piece = null), Square(piece = null),
-//    //            Square(piece = null), Square(piece = null), Square(piece = null), Square(piece = null),
-//    //        ),
-//    //        arrayOf(
-//    //            Square(piece = null), Square(piece = null), Square(piece = null), Square(piece = null),
-//    //            Square(piece = null), Square(piece = null), Square(piece = null), Square(piece = null),
-//    //        ),
-//    //        arrayOf(
-//    //            Square(piece = null), Square(piece = null), Square(piece = null), Square(piece = null),
-//    //            Square(piece = null), Square(piece = null), Square(piece = null), Square(piece = null),
-//    //        ),
-//    //        arrayOf(
-//    //            Square(piece = null), Square(piece = null), Square(piece = null), Square(piece = null),
-//    //            Square(piece = null), Square(piece = null), Square(piece = null), Square(piece = null),
-//    //        ),
-//    //        arrayOf(
-//    //            Square(Piece.Pawn(PieceColor.White)),
-//    //            Square(Piece.Pawn(PieceColor.White)),
-//    //            Square(Piece.Pawn(PieceColor.White)),
-//    //            Square(Piece.Pawn(PieceColor.White)),
-//    //            Square(Piece.Pawn(PieceColor.White)),
-//    //            Square(Piece.Pawn(PieceColor.White)),
-//    //            Square(Piece.Pawn(PieceColor.White)),
-//    //            Square(Piece.Pawn(PieceColor.White)),
-//    //        ),
-//    //        arrayOf(
-//    //            Square(Piece.Rook(PieceColor.White)),
-//    //            Square(Piece.Knight(PieceColor.White)),
-//    //            Square(Piece.Bishop(PieceColor.White)),
-//    //            Square(Piece.King(PieceColor.White)),
-//    //            Square(Piece.Queen(PieceColor.White)),
-//    //            Square(Piece.Bishop(PieceColor.White)),
-//    //            Square(Piece.Knight(PieceColor.White)),
-//    //            Square(Piece.Rook(PieceColor.White)),
-//    //        ),
-//    //    )
-//
-//    fun findAttacks(color: PieceColor): Set<Coordinates> {
-//        val attackedSquares = mutableSetOf<Coordinates>()
-//        for (row in 0..7) {
-//            for (col in 0..7) {
-//                val piece = squares[col][row].piece
-//                if (piece != null && piece.color == color) {
-//                    attackedSquares.addAll(piece.findMoveDestinationCoordinates(this, Coordinates(col, row)))
-//                }
-//            }
-//        }
-//        return attackedSquares
-//    }
-//
-//    fun getSquareOrNull(coordinates: Coordinates) =
-//        squares.getOrNull(coordinates.col)?.getOrNull(coordinates.row)
-//
-//    fun getSquare(coordinates: Coordinates) =
-//        squares[coordinates.col][coordinates.row]
-//
-//    fun getPiece(coordinates: Coordinates): Piece? =
-//        getSquareOrNull(coordinates)?.piece
-//
-//
-//    operator fun get(col: Int, row: Int) = squares[col][row]
-//
 fun squareCanBeAttacked(
     board: Board,
     attackingColor: PieceColor,
@@ -534,6 +454,8 @@ private fun isUnderRowOrColumnAttack(
             )
 }
 
+// Squares can be under attack from pieces that are pinned.
+// That's because a king can't move into check, even if the "checking" piece is pinned.
 private fun isUnderAttackFrom(
     board: Board,
     enemyColor: PieceColor,
@@ -658,17 +580,21 @@ private fun isUnderKingAttack(
 
 fun isCheckmate(board: Board, color: PieceColor): Boolean {
     val kingSquare = board.getKingSquare(color)
+    val king = kingSquare.piece as King
+    val kingNotInCheck = !king.isInCheck(
+        board = board,
+        kingCoordinates = kingSquare.coordinates
+    )
+    if (kingNotInCheck) return false
+
+    // TODO remove the potential for recursive calls by removing the call to findValidMoves() and
+    //  replacing it with calls to squareCanBeAttacked().
     val kingsValidMoves = findValidMoves(
         board = board,
         coordinates = kingSquare.coordinates,
         checkForStalemate = false
     )
-    val king = kingSquare.piece as King
-    val kingInCheck = king.isInCheck(
-        board = board,
-        kingCoordinates = kingSquare.coordinates
-    )
-    return kingInCheck && kingsValidMoves.isEmpty()
+    return kingsValidMoves.isEmpty()
 }
 
 fun isStalemate(board: Board, color: PieceColor): Boolean {

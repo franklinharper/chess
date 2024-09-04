@@ -536,14 +536,55 @@ class KingTest {
         val board = Board(
             squares = setOf(
                 // Black
-                Square(piece = King(Black, hasMoved = false), coordinates = blackKingInitialCoordinates),
+                Square(
+                    piece = King(Black, hasMoved = false),
+                    coordinates = blackKingInitialCoordinates
+                ),
                 // White
-                Square(piece = Queen(White, hasMoved = true), coordinates = Coordinates(col = 4, row = 1)),
-                Square(piece = King(White, hasMoved = true), coordinates = Coordinates(col = 4, row = 2))
+                Square(
+                    piece = Queen(White, hasMoved = true),
+                    coordinates = Coordinates(col = 4, row = 1)
+                ),
+                Square(
+                    piece = King(White, hasMoved = true),
+                    coordinates = Coordinates(col = 4, row = 2)
+                )
             ),
         )
         assertFalse(isCheckmate(board, White))
-        assertTrue(isCheckmate(board,Black))
+        assertTrue(isCheckmate(board, Black))
+    }
+
+    @Test
+    fun testCheckmateWithPinnedRook() {
+        val board = Board(
+            squares = setOf(
+                // White
+                Square(
+                    piece = King(White, hasMoved = true),
+                    coordinates = Coordinates(col = 0, row = 7)
+                ),
+                Square(
+                    piece = Bishop(White, hasMoved = true),
+                    coordinates = Coordinates(col = 2, row = 2)
+                ),
+                // Black
+                Square(
+                    piece = King(Black, hasMoved = true),
+                    coordinates = Coordinates(col = 0, row = 0)
+                ),
+                Square(
+                    piece = Rook(Black, hasMoved = true),
+                    coordinates = Coordinates(col = 1, row = 1)
+                ),
+                Square(
+                    piece = Queen(Black, hasMoved = true),
+                    coordinates = Coordinates(col = 1, row = 6)
+                ),
+            ),
+        )
+        assertFalse(isCheckmate(board, Black))
+        assertTrue(isCheckmate(board, White))
     }
 
     @Test
@@ -551,16 +592,25 @@ class KingTest {
         val board = Board(
             squares = setOf(
                 // Black
-                Square(piece = King(Black, hasMoved = false), coordinates = blackKingInitialCoordinates),
+                Square(
+                    piece = King(Black, hasMoved = false),
+                    coordinates = blackKingInitialCoordinates
+                ),
                 // White
-                Square(piece = Queen(White, hasMoved = true), coordinates = Coordinates(col = 6, row = 1)),
-                Square(piece = King(White, hasMoved = true), coordinates = Coordinates(col = 4, row = 2))
+                Square(
+                    piece = Queen(White, hasMoved = true),
+                    coordinates = Coordinates(col = 6, row = 1)
+                ),
+                Square(
+                    piece = King(White, hasMoved = true),
+                    coordinates = Coordinates(col = 4, row = 2)
+                )
             ),
         )
-            .move(from = Coordinates(
-                col = 6,
-                row = 1
-            ), to = Coordinates(col = 6, row = 0))
+            .move(
+                from = Coordinates(col = 6, row = 1),
+                to = Coordinates(col = 6, row = 0)
+            )
         assertFalse(isCheckmate(board, White))
         assertTrue(isCheckmate(board, Black))
     }
@@ -570,10 +620,19 @@ class KingTest {
         val board = Board(
             squares = setOf(
                 // Black
-                Square(piece = King(Black, hasMoved = false), coordinates = blackKingInitialCoordinates),
+                Square(
+                    piece = King(Black, hasMoved = false),
+                    coordinates = blackKingInitialCoordinates
+                ),
                 // White
-                Square(piece = Bishop(White, hasMoved = true), coordinates = Coordinates(col = 4, row = 1)),
-                Square(piece = King(White, hasMoved = true), coordinates = Coordinates(col = 4, row = 2)),
+                Square(
+                    piece = Bishop(White, hasMoved = true),
+                    coordinates = Coordinates(col = 4, row = 1)
+                ),
+                Square(
+                    piece = King(White, hasMoved = true),
+                    coordinates = Coordinates(col = 4, row = 2)
+                ),
             ),
         )
         assertFalse(isStalemate(board, White))
@@ -585,12 +644,27 @@ class KingTest {
         val board = Board(
             squares = setOf(
                 // Black
-                Square(piece = King(Black, hasMoved = true), coordinates = Coordinates(col = 0, row = 0)),
-                Square(piece = Pawn(Black, hasMoved = false), coordinates = Coordinates(col = 1, row = 1)),
+                Square(
+                    piece = King(Black, hasMoved = true),
+                    coordinates = Coordinates(col = 0, row = 0)
+                ),
+                Square(
+                    piece = Pawn(Black, hasMoved = false),
+                    coordinates = Coordinates(col = 1, row = 1)
+                ),
                 // White
-                Square(piece = King(White, hasMoved = true), coordinates = Coordinates(col = 2, row = 0)),
-                Square(piece = Bishop(White, hasMoved = true), coordinates = Coordinates(col = 6, row = 7)),
-                Square(piece = Bishop(White, hasMoved = true), coordinates = Coordinates(col = 7, row = 7)),
+                Square(
+                    piece = King(White, hasMoved = true),
+                    coordinates = Coordinates(col = 2, row = 0)
+                ),
+                Square(
+                    piece = Bishop(White, hasMoved = true),
+                    coordinates = Coordinates(col = 6, row = 7)
+                ),
+                Square(
+                    piece = Bishop(White, hasMoved = true),
+                    coordinates = Coordinates(col = 7, row = 7)
+                ),
             ),
         )
         assertFalse(isStalemate(board, White))
