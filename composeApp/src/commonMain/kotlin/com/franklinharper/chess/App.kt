@@ -123,7 +123,7 @@ val lightSquareBackground = Color.LightGray
 
 @Composable
 private fun ChessBoard(
-    state: Board,
+    board: Board,
     viewModel: ViewModel,
 ) {
     Column(
@@ -131,12 +131,12 @@ private fun ChessBoard(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("${state.boardStatus}")
+        Text(board.getStatus().toString())
         for (rowIndex in 0..7) {
             Row {
                 for (colIndex in 0..7) {
                     val isLightSquare = (rowIndex + colIndex) % 2 == 0
-                    val square = state.getSquare(colIndex, rowIndex)
+                    val square = board.getSquare(colIndex, rowIndex)
                     val backgroundColor = if (isLightSquare) {
                         when {
                             square.isSelected -> Color.Red

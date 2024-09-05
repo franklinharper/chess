@@ -20,19 +20,20 @@ import kotlin.reflect.KClass
 
 data class Board(
     val squareMap: Map<Coordinates, Square> = emptyMap(),
-    val boardStatus: BoardStatus,
+    val moveColor: PieceColor, // Who's turn is it to move?
 ) {
-    constructor(squares: Set<Square>, boardStatus: BoardStatus = WhitesMove) :
-            this(
-                squareMap = squares.associateBy { square -> square.coordinates },
-                boardStatus = boardStatus
-            )
+    constructor(
+        squares: Set<Square>,
+        moveColor: PieceColor,
+    ) : this(
+        squareMap = squares.associateBy { square -> square.coordinates },
+        moveColor = moveColor,
+    )
 
-    constructor() :
-            this(
-                boardStatus = WhitesMove,
-                squares =  initialSetup,
-            )
+    constructor() : this(
+        squares = initialSetup,
+        moveColor = White,
+    )
 
     // TODO write tests for this function?
     fun clickSquare(
@@ -54,19 +55,17 @@ data class Board(
                     .move(
                         from = fromSquare.coordinates,
                         to = square.coordinates,
-                        checkForStalemate = true,
                     )
             }
 
             // Select square
             square.isNotSelected
                     && square.piece != null
-                    && square.piece.color == boardStatus.toColor() -> {
+                    && square.piece.color == getStatus().toColor() -> {
 
                 val validMoves = findValidMoves(
                     board = this,
                     coordinates = square.coordinates,
-                    checkForStalemate = false
                 )
                 copyAndDeselectAllSquares()
                     .copyAndUpdateValidMoves(validMoves)
@@ -83,26 +82,35 @@ data class Board(
     fun move(
         from: Coordinates,
         to: Coordinates,
-        checkForStalemate: Boolean = true,
     ): Board {
-        val fromPiece = getSquare(from).piece!!
-        val color = fromPiece.color
         val newMap = copyMapAndMakeMove(
-            fromPiece = fromPiece,
+            fromPiece = getSquare(from).piece!!,
             from = from,
             to = to,
         )
-        val newBoard = Board(squareMap = newMap, boardStatus = boardStatus)
-        val newStatus = when {
-            color == White && isCheckmate(board = newBoard, color = Black) -> WhiteWin
-            color == Black && isCheckmate(board = newBoard, color = White) -> BlackWin
-            checkForStalemate && isStalemate(board = newBoard, color = color.enemyColor()) -> Stalemate
-            boardStatus == BlacksMove-> WhitesMove
-            boardStatus == WhitesMove-> BlacksMove
-            else -> throw IllegalStateException("Error calculating board status")
-        }
-        return Board(squareMap = newMap, boardStatus = newStatus)
+        return Board(
+            squareMap = newMap,
+            moveColor = moveColor.enemyColor()
+        )
     }
+
+    fun getStatus(): BoardStatus =
+        when {
+            moveColor == White && isCheckmate(board = this, color = White)
+            -> BlackWin
+
+            moveColor == Black && isCheckmate(board = this, color = Black)
+            -> WhiteWin
+
+            isStalemate(board = this, color = moveColor)
+            -> Stalemate
+
+            else
+            -> when (moveColor) {
+                White -> WhitesMove
+                Black -> BlacksMove
+            }
+        }
 
     private fun copyMapAndMakeMove(
         fromPiece: Piece,
@@ -210,7 +218,7 @@ data class Board(
         }
         return Board(
             squareMap = mutableMap,
-            boardStatus = boardStatus
+            moveColor = moveColor,
         )
     }
 
@@ -219,7 +227,10 @@ data class Board(
         for (square in mutableMap.values) {
             if (square.isSelected) mutableMap[square.coordinates] = square.copy(isSelected = false)
         }
-        return Board(squareMap = mutableMap, boardStatus = boardStatus)
+        return Board(
+            squareMap = mutableMap,
+            moveColor = moveColor,
+        )
     }
 
     private fun copyAndReplaceSquare(newSquare: Square): Board {
@@ -227,12 +238,12 @@ data class Board(
         mutableMap[newSquare.coordinates] = newSquare
         return Board(
             squareMap = mutableMap,
-            boardStatus = boardStatus
+            moveColor = moveColor,
         )
     }
 
     override fun toString(): String {
-        return "moveColor=$boardStatus, squares=${squareMap.values})"
+        return "moveColor=$moveColor, squares=${squareMap.values})"
     }
 
     fun removePiece(from: Coordinates): Board {
@@ -240,49 +251,49 @@ data class Board(
         mutableMap.remove(from)
         // The board status is not recalculated; which is a bug.
         // TODO fix the bug by removing the boardSatus property from Board
-        return Board(squareMap = mutableMap, boardStatus = boardStatus)
+        return Board(squareMap = mutableMap, moveColor = moveColor)
     }
 
     companion object {
 
         val initialSetup = setOf(
-        // Black
-        Square(piece = Rook(Black), coordinates = Coordinates(col = 0, row = 0)),
-        Square(piece = Knight(Black), coordinates = Coordinates(col = 1, row = 0)),
-        Square(piece = Bishop(Black), coordinates = Coordinates(col = 2, row = 0)),
-        Square(piece = Queen(Black), coordinates = Coordinates(col = 3, row = 0)),
-        Square(piece = King(Black), coordinates = blackKingInitialCoordinates),
-        Square(piece = Bishop(Black), coordinates = Coordinates(col = 5, row = 0)),
-        Square(piece = Knight(Black), coordinates = Coordinates(col = 6, row = 0)),
-        Square(piece = Rook(Black), coordinates = Coordinates(col = 7, row = 0)),
+            // Black
+            Square(piece = Rook(Black), coordinates = Coordinates(col = 0, row = 0)),
+            Square(piece = Knight(Black), coordinates = Coordinates(col = 1, row = 0)),
+            Square(piece = Bishop(Black), coordinates = Coordinates(col = 2, row = 0)),
+            Square(piece = Queen(Black), coordinates = Coordinates(col = 3, row = 0)),
+            Square(piece = King(Black), coordinates = blackKingInitialCoordinates),
+            Square(piece = Bishop(Black), coordinates = Coordinates(col = 5, row = 0)),
+            Square(piece = Knight(Black), coordinates = Coordinates(col = 6, row = 0)),
+            Square(piece = Rook(Black), coordinates = Coordinates(col = 7, row = 0)),
 
-        Square(piece = Pawn(Black), coordinates = Coordinates(col = 0, row = 1)),
-        Square(piece = Pawn(Black), coordinates = Coordinates(col = 1, row = 1)),
-        Square(piece = Pawn(Black), coordinates = Coordinates(col = 2, row = 1)),
-        Square(piece = Pawn(Black), coordinates = Coordinates(col = 3, row = 1)),
-        Square(piece = Pawn(Black), coordinates = Coordinates(col = 4, row = 1)),
-        Square(piece = Pawn(Black), coordinates = Coordinates(col = 5, row = 1)),
-        Square(piece = Pawn(Black), coordinates = Coordinates(col = 6, row = 1)),
-        Square(piece = Pawn(Black), coordinates = Coordinates(col = 7, row = 1)),
+            Square(piece = Pawn(Black), coordinates = Coordinates(col = 0, row = 1)),
+            Square(piece = Pawn(Black), coordinates = Coordinates(col = 1, row = 1)),
+            Square(piece = Pawn(Black), coordinates = Coordinates(col = 2, row = 1)),
+            Square(piece = Pawn(Black), coordinates = Coordinates(col = 3, row = 1)),
+            Square(piece = Pawn(Black), coordinates = Coordinates(col = 4, row = 1)),
+            Square(piece = Pawn(Black), coordinates = Coordinates(col = 5, row = 1)),
+            Square(piece = Pawn(Black), coordinates = Coordinates(col = 6, row = 1)),
+            Square(piece = Pawn(Black), coordinates = Coordinates(col = 7, row = 1)),
 
-        // White
-        Square(piece = Pawn(White), coordinates = Coordinates(col = 0, row = 6)),
-        Square(piece = Pawn(White), coordinates = Coordinates(col = 1, row = 6)),
-        Square(piece = Pawn(White), coordinates = Coordinates(col = 2, row = 6)),
-        Square(piece = Pawn(White), coordinates = Coordinates(col = 3, row = 6)),
-        Square(piece = Pawn(White), coordinates = Coordinates(col = 4, row = 6)),
-        Square(piece = Pawn(White), coordinates = Coordinates(col = 5, row = 6)),
-        Square(piece = Pawn(White), coordinates = Coordinates(col = 6, row = 6)),
-        Square(piece = Pawn(White), coordinates = Coordinates(col = 7, row = 6)),
+            // White
+            Square(piece = Pawn(White), coordinates = Coordinates(col = 0, row = 6)),
+            Square(piece = Pawn(White), coordinates = Coordinates(col = 1, row = 6)),
+            Square(piece = Pawn(White), coordinates = Coordinates(col = 2, row = 6)),
+            Square(piece = Pawn(White), coordinates = Coordinates(col = 3, row = 6)),
+            Square(piece = Pawn(White), coordinates = Coordinates(col = 4, row = 6)),
+            Square(piece = Pawn(White), coordinates = Coordinates(col = 5, row = 6)),
+            Square(piece = Pawn(White), coordinates = Coordinates(col = 6, row = 6)),
+            Square(piece = Pawn(White), coordinates = Coordinates(col = 7, row = 6)),
 
-        Square(piece = Rook(White), coordinates = Coordinates(col = 0, row = 7)),
-        Square(piece = Knight(White), coordinates = Coordinates(col = 1, row = 7)),
-        Square(piece = Bishop(White), coordinates = Coordinates(col = 2, row = 7)),
-        Square(piece = Queen(White), coordinates = Coordinates(col = 3, row = 7)),
-        Square(piece = King(White), coordinates = whiteKingInitialCoordinates),
-        Square(piece = Bishop(White), coordinates = Coordinates(col = 5, row = 7)),
-        Square(piece = Knight(White), coordinates = Coordinates(col = 6, row = 7)),
-        Square(piece = Rook(White), coordinates = Coordinates(col = 7, row = 7)),
+            Square(piece = Rook(White), coordinates = Coordinates(col = 0, row = 7)),
+            Square(piece = Knight(White), coordinates = Coordinates(col = 1, row = 7)),
+            Square(piece = Bishop(White), coordinates = Coordinates(col = 2, row = 7)),
+            Square(piece = Queen(White), coordinates = Coordinates(col = 3, row = 7)),
+            Square(piece = King(White), coordinates = whiteKingInitialCoordinates),
+            Square(piece = Bishop(White), coordinates = Coordinates(col = 5, row = 7)),
+            Square(piece = Knight(White), coordinates = Coordinates(col = 6, row = 7)),
+            Square(piece = Rook(White), coordinates = Coordinates(col = 7, row = 7)),
         )
         val endGameSetupForTesting = setOf(
             // Black
@@ -332,13 +343,11 @@ data class Board(
 fun findValidMoves(
     board: Board,
     coordinates: Coordinates,
-    checkForStalemate: Boolean = true,
 ): Set<Coordinates> =
     board.getPieceOrNull(coordinates)!!
         .findValidToCoordinates(
             board = board,
             fromCoordinates = coordinates,
-            checkForStalemate = checkForStalemate,
         )
 
 fun findAllValidMovesByColor(board: Board, color: PieceColor): Set<Move> =
@@ -351,7 +360,6 @@ fun findAllValidMovesByColor(board: Board, color: PieceColor): Set<Move> =
             findValidMoves(
                 board = board,
                 coordinates = square.coordinates,
-                checkForStalemate = false
             ).map { toCoordinates ->
                 Move(
                     from = square.coordinates,
@@ -592,7 +600,6 @@ fun isCheckmate(board: Board, color: PieceColor): Boolean {
     val kingsValidMoves = findValidMoves(
         board = board,
         coordinates = kingSquare.coordinates,
-        checkForStalemate = false
     )
     return kingsValidMoves.isEmpty()
 }
@@ -615,7 +622,6 @@ fun isStalemate(board: Board, color: PieceColor): Boolean {
             findValidMoves(
                 board = board,
                 coordinates = square.coordinates,
-                checkForStalemate = false,
             ).isNotEmpty()
         }
     return !atLeastOneValidMove

@@ -21,7 +21,7 @@ class ViewModel {
     fun onSetEndGamePositionClick() {
         _state.value = Board(
             squares = endGameSetupForTesting,
-            boardStatus = BoardStatus.WhitesMove,
+            moveColor = PieceColor.White,
         )
     }
 
