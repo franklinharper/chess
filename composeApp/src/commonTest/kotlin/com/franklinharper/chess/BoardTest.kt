@@ -23,7 +23,8 @@ class BoardTest {
     @Test
     fun testBishopDiagonalAttacks() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 Square(piece = Bishop(White), coordinates = Coordinates(col = 1, row = 1)),
             )
         )
@@ -87,7 +88,8 @@ class BoardTest {
     @Test
     fun testQueenDiagonalAttacks() {
         val board = Board(
-            setOf(
+            moveColor = Black,
+            squares = setOf(
                 Square(piece = Queen(Black), coordinates = Coordinates(col = 6, row = 7)),
             )
         )
@@ -121,7 +123,8 @@ class BoardTest {
     @Test
     fun testRookAttacks() {
         val board = Board(
-            setOf(
+            moveColor = Black,
+            squares = setOf(
                 Square(piece = Rook(Black), coordinates = Coordinates(col = 1, row = 1)),
             )
         )
@@ -138,7 +141,8 @@ class BoardTest {
     @Test
     fun testKnightAttacks() {
         val board = Board(
-            setOf(
+            moveColor = Black,
+            squares = setOf(
                 Square(piece = Knight(Black), coordinates = Coordinates(col = 1, row = 1)),
             )
         )
@@ -190,7 +194,8 @@ class BoardTest {
     @Test
     fun testBlackPawnAttacks() {
         val board = Board(
-            setOf(
+            moveColor = Black,
+            squares = setOf(
                 Square(
                     piece = Pawn(Black, twoSquareAdvanceOnPreviousMove = true),
                     coordinates = Coordinates(col = 1, row = 1)
@@ -223,7 +228,8 @@ class BoardTest {
     @Test
     fun testWhitePawnAttacks() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 Square(
                     piece = Pawn(White, twoSquareAdvanceOnPreviousMove = true),
                     coordinates = Coordinates(col = 1, row = 1)
@@ -256,7 +262,8 @@ class BoardTest {
     @Test
     fun testKingAttacks() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 Square(piece = King(White), coordinates = Coordinates(col = 1, row = 1)),
             )
         )
@@ -336,7 +343,8 @@ class BoardTest {
     fun testBasicMove() {
         val board =
             Board(
-                setOf(
+                moveColor = White,
+                squares = setOf(
                     // White
                     Square(
                         piece = King(White, hasMoved = true),
@@ -365,7 +373,8 @@ class BoardTest {
     fun testCaptureMove() {
         val board =
             Board(
-                setOf(
+                moveColor = Black,
+                squares = setOf(
                     // Black
                     Square(
                         piece = King(Black, hasMoved = false),

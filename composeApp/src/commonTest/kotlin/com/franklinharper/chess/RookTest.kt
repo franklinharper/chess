@@ -113,7 +113,8 @@ class RookTest {
     @Test
     fun testMoveCantPutKingInCheck() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // White
                 Square(piece = King(White), coordinates = Coordinates(col = 0, row = 0)),
                 // This piece is pinned to the King
@@ -128,7 +129,6 @@ class RookTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 1, row = 1),
-                checkForStalemate = false
             )
         )
     }
@@ -136,7 +136,8 @@ class RookTest {
     @Test
     fun testMoveDefendsKingFromCheck() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // White
                 Square(piece = King(color = White), coordinates = Coordinates(col = 0, row = 0)),
                 // This Rook can defend the King
@@ -151,7 +152,6 @@ class RookTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 1, row = 1),
-                checkForStalemate = false
             )
         )
     }
@@ -159,7 +159,8 @@ class RookTest {
     @Test
     fun testCaptureRemovesCheckOnKing() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // White
                 Square(piece = King(color = White), coordinates = Coordinates(col = 0, row = 0)),
                 // This Rook can capture the Rook that is attacking the King
@@ -174,7 +175,6 @@ class RookTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 1, row = 2),
-                checkForStalemate = false
             )
         )
     }

@@ -11,7 +11,8 @@ class KnightTest {
     @Test
     fun testMovesToEmptySquaresArePossible() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 Square(
                     piece = King(White),
                     coordinates = whiteKingInitialCoordinates
@@ -39,7 +40,6 @@ class KnightTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 2, row = 2),
-                checkForStalemate = false
             )
         )
     }
@@ -47,7 +47,8 @@ class KnightTest {
     @Test
     fun testMovesToUnoccupiedSquaresArePossible() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 Square(
                     piece = King(White),
                     coordinates = whiteKingInitialCoordinates,
@@ -67,15 +68,16 @@ class KnightTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 0, row = 1),
-                checkForStalemate = false
-            )
+
+                )
         )
     }
 
     @Test
     fun testMovesToEnemyOccupiedSquaresArePossible() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 Square(
                     piece = King(White),
                     coordinates = whiteKingInitialCoordinates,
@@ -99,19 +101,26 @@ class KnightTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 0, row = 1),
-                checkForStalemate = false
-            )
+
+                )
         )
     }
 
     @Test
     fun testEdgesAndFriendlyPiecesBlockMoves() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 Square(piece = King(White), coordinates = whiteKingInitialCoordinates),
                 Square(piece = Knight(White), coordinates = Coordinates(col = 0, row = 0)),
-                Square(piece = Pawn(White, twoSquareAdvanceOnPreviousMove = true), coordinates = Coordinates(col = 1, row = 2)),
-                Square(piece = Pawn(White, twoSquareAdvanceOnPreviousMove = true), coordinates = Coordinates(col = 2, row = 1)),
+                Square(
+                    piece = Pawn(White, twoSquareAdvanceOnPreviousMove = true),
+                    coordinates = Coordinates(col = 1, row = 2)
+                ),
+                Square(
+                    piece = Pawn(White, twoSquareAdvanceOnPreviousMove = true),
+                    coordinates = Coordinates(col = 2, row = 1)
+                ),
             )
         )
         assertEquals(
@@ -119,15 +128,16 @@ class KnightTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 0, row = 0),
-                checkForStalemate = false
-            )
+
+                )
         )
     }
 
     @Test
     fun testMoveCantPutKingInCheck() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // White
                 Square(piece = King(White), coordinates = Coordinates(col = 0, row = 0)),
                 Square(piece = Knight(White), coordinates = Coordinates(col = 0, row = 1)),
@@ -140,15 +150,16 @@ class KnightTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 0, row = 1),
-                checkForStalemate = false
-            )
+
+                )
         )
     }
 
     @Test
     fun testMoveDefendsKingFromCheck() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // White
                 Square(piece = King(White), coordinates = Coordinates(col = 0, row = 0)),
                 Square(piece = Knight(White), coordinates = Coordinates(col = 2, row = 0)),
@@ -161,15 +172,16 @@ class KnightTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 2, row = 0),
-                checkForStalemate = false
-            )
+
+                )
         )
     }
 
     @Test
     fun testCaptureRemovesCheckOnKing() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // White
                 Square(piece = King(White), coordinates = Coordinates(col = 0, row = 0)),
                 Square(piece = Knight(White), coordinates = Coordinates(col = 1, row = 0)),
@@ -182,8 +194,8 @@ class KnightTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 1, row = 0),
-                checkForStalemate = false
-            )
+
+                )
         )
     }
 
@@ -192,7 +204,8 @@ class KnightTest {
         // This test reproduces a bug in move validation where the friendly king was removed
         // from the board. This would cause a null pointer exception to be thrown.
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // White
                 Square(piece = King(White), coordinates = whiteKingInitialCoordinates),
                 Square(piece = Knight(White), coordinates = Coordinates(col = 5, row = 5)),
@@ -213,8 +226,8 @@ class KnightTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 5, row = 5),
-                checkForStalemate = false
-            )
+
+                )
         )
     }
 
@@ -234,8 +247,8 @@ class KnightTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 6, row = 1),
-                checkForStalemate = false
-            )
+
+                )
         )
     }
 }

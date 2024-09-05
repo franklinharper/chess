@@ -12,7 +12,8 @@ class BishopTest {
     @Test
     fun testAllMovesArePossible() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // White
                 Square(piece = King(White), coordinates = whiteKingInitialCoordinates),
                 Square(piece = Bishop(White), coordinates = Coordinates(col = 3, row = 3)),
@@ -38,7 +39,8 @@ class BishopTest {
     @Test
     fun testFriendlyPiecesBlockMoves() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // White
                 Square(piece = King(White), coordinates = whiteKingInitialCoordinates),
                 Square(piece = Bishop(White), coordinates = Coordinates(col = 3, row = 3)),
@@ -73,7 +75,8 @@ class BishopTest {
     @Test
     fun testMovesAreBlockedAfterEnemyPieces() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // White
                 Square(piece = King(White), coordinates = whiteKingInitialCoordinates),
                 Square(piece = Bishop(White), coordinates = Coordinates(col = 3, row = 3)),
@@ -108,7 +111,8 @@ class BishopTest {
     @Test
     fun testCornerCaseAndNoPossibleMoves() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // White
                 Square(piece = King(White), coordinates = whiteKingInitialCoordinates),
                 Square(piece = Bishop(White), coordinates = Coordinates(col = 7, row = 7)),
@@ -130,7 +134,8 @@ class BishopTest {
     @Test
     fun testMoveCantPutKingInCheck() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // White
                 Square(piece = King(White), coordinates = Coordinates(col = 0, row = 0)),
                 Square(piece = Bishop(White), coordinates = Coordinates(col = 0, row = 1)),
@@ -151,7 +156,8 @@ class BishopTest {
     @Test
     fun testMoveDefendsKingFromCheck() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // White
                 Square(piece = King(White), coordinates = Coordinates(col = 0, row = 0)),
                 Square(piece = Bishop(White), coordinates = Coordinates(col = 1, row = 0)),
@@ -165,7 +171,6 @@ class BishopTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 1, row = 0),
-                checkForStalemate = false
             )
         )
     }
@@ -173,7 +178,8 @@ class BishopTest {
     @Test
     fun testCaptureRemovesCheckOnKing() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // White
                 Square(piece = King(White), coordinates = Coordinates(col = 0, row = 0)),
                 Square(piece = Bishop(White), coordinates = Coordinates(col = 2, row = 0)),
@@ -187,7 +193,6 @@ class BishopTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 2, row = 0),
-                checkForStalemate = false
             )
         )
     }

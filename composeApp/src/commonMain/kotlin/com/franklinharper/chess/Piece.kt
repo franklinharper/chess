@@ -45,25 +45,25 @@ sealed class Piece {
         ): Set<Coordinates> {
             val possibleMoves = mutableSetOf<Coordinates>()
             possibleMoves.addAll(
-                rowLeft(
+                rowLeftValidToCoordinates(
                     board = board,
                     fromCoordinates = fromCoordinates,
                 )
             )
             possibleMoves.addAll(
-                rowRight(
+                rowRightValidToCoordinates(
                     board = board,
                     initialCoordinates = fromCoordinates,
                 )
             )
             possibleMoves.addAll(
-                colUp(
+                colUpValidToCoordinates(
                     board = board,
                     initialCoordinates = fromCoordinates,
                 ),
             )
             possibleMoves.addAll(
-                colDown(
+                colDownValidToCoordinates(
                     board = board,
                     initialCoordinates = fromCoordinates,
                 ),
@@ -101,7 +101,7 @@ sealed class Piece {
         override fun findValidToCoordinates(
             board: Board,
             fromCoordinates: Coordinates,
-        ): Set<Coordinates> = findPossibleMovesByOffsets(
+        ): Set<Coordinates> = findValidToCoordinatesByOffsets(
             board = board,
             sourceCoordinates = fromCoordinates,
             offsets = offsets,
@@ -119,19 +119,19 @@ sealed class Piece {
             fromCoordinates: Coordinates,
         ): Set<Coordinates> {
             val possibleMoves = mutableSetOf<Coordinates>()
-            possibleMoves.addAll(upperLeftDiagonal(
+            possibleMoves.addAll(upperLeftDiagonalValidToCoordinates(
                 board = board,
                 initialCoordinates = fromCoordinates,
             ))
-            possibleMoves.addAll(upperRightDiagonal(
+            possibleMoves.addAll(upperRightDiagonalValidToCoordinates(
                 board = board,
                 initialCoordinates = fromCoordinates,
             ))
-            possibleMoves.addAll(lowerLeftDiagonal(
+            possibleMoves.addAll(lowerLeftDiagonalValidToCoordinates(
                 board = board,
                 initialCoordinates = fromCoordinates,
             ))
-            possibleMoves.addAll(lowerRightDiagonal(
+            possibleMoves.addAll(lowerRightDiagonalValidToCoordinates(
                 board = board,
                 initialCoordinates = fromCoordinates,
             ))
@@ -275,37 +275,37 @@ sealed class Piece {
             val possibleMoves = mutableSetOf<Coordinates>()
 
             // Diagonals
-            possibleMoves.addAll(upperLeftDiagonal(
+            possibleMoves.addAll(upperLeftDiagonalValidToCoordinates(
                 board = board,
                 initialCoordinates = fromCoordinates,
             ))
-            possibleMoves.addAll(upperRightDiagonal(
+            possibleMoves.addAll(upperRightDiagonalValidToCoordinates(
                 board = board,
                 initialCoordinates = fromCoordinates,
             ))
-            possibleMoves.addAll(lowerLeftDiagonal(
+            possibleMoves.addAll(lowerLeftDiagonalValidToCoordinates(
                 board = board,
                 initialCoordinates = fromCoordinates,
             ))
-            possibleMoves.addAll(lowerRightDiagonal(
+            possibleMoves.addAll(lowerRightDiagonalValidToCoordinates(
                 board = board,
                 initialCoordinates = fromCoordinates,
             ))
 
             // Rows and Columns
-            possibleMoves.addAll(rowLeft(
+            possibleMoves.addAll(rowLeftValidToCoordinates(
                 board = board,
                 fromCoordinates = fromCoordinates,
             ))
-            possibleMoves.addAll(rowRight(
+            possibleMoves.addAll(rowRightValidToCoordinates(
                 board = board,
                 initialCoordinates = fromCoordinates,
             ))
-            possibleMoves.addAll(colUp(
+            possibleMoves.addAll(colUpValidToCoordinates(
                 board = board,
                 initialCoordinates = fromCoordinates,
             ))
-            possibleMoves.addAll(colDown(
+            possibleMoves.addAll(colDownValidToCoordinates(
                 board,
                 fromCoordinates,
             ))
@@ -421,7 +421,7 @@ sealed class Piece {
         override fun copy(hasMoved: Boolean) = Pawn(this.color, hasMoved)
     }
 
-    internal fun findPossibleMovesByOffsets(
+    internal fun findValidToCoordinatesByOffsets(
         board: Board,
         sourceCoordinates: Coordinates,
         offsets: Set<Pair<Int, Int>>,
@@ -464,88 +464,88 @@ sealed class Piece {
         )
     }
 
-    internal fun rowLeft(
+    internal fun rowLeftValidToCoordinates(
         board: Board,
         fromCoordinates: Coordinates,
     ): Collection<Coordinates> =
-        findPossibleMoveCoordinates(
+        findValidToCoordinates(
             board = board,
             initialCoordinates = fromCoordinates,
             colDelta = -1,
             rowDelta = 0,
         )
 
-    internal fun rowRight(
+    internal fun rowRightValidToCoordinates(
         board: Board,
         initialCoordinates: Coordinates,
     ): Collection<Coordinates> =
-        findPossibleMoveCoordinates(
+        findValidToCoordinates(
             board = board,
             initialCoordinates = initialCoordinates,
             colDelta = 1,
             rowDelta = 0,
         )
 
-    internal fun colUp(
+    internal fun colUpValidToCoordinates(
         board: Board,
         initialCoordinates: Coordinates,
     ): Collection<Coordinates> =
-        findPossibleMoveCoordinates(
+        findValidToCoordinates(
             board = board,
             initialCoordinates = initialCoordinates,
             colDelta = 0,
             rowDelta = -1,
         )
 
-    internal fun colDown(
+    internal fun colDownValidToCoordinates(
         board: Board,
         initialCoordinates: Coordinates,
     ): Collection<Coordinates> =
-        findPossibleMoveCoordinates(
+        findValidToCoordinates(
             board = board,
             initialCoordinates = initialCoordinates,
             colDelta = 0,
             rowDelta = 1,
         )
 
-    internal fun upperLeftDiagonal(
+    internal fun upperLeftDiagonalValidToCoordinates(
         board: Board,
         initialCoordinates: Coordinates,
     ): Collection<Coordinates> =
-        findPossibleMoveCoordinates(
+        findValidToCoordinates(
             board = board,
             initialCoordinates = initialCoordinates,
             colDelta = -1,
             rowDelta = -1,
         )
 
-    internal fun upperRightDiagonal(
+    internal fun upperRightDiagonalValidToCoordinates(
         board: Board,
         initialCoordinates: Coordinates,
     ): Collection<Coordinates> =
-        findPossibleMoveCoordinates(
+        findValidToCoordinates(
             board = board,
             initialCoordinates = initialCoordinates,
             colDelta = 1,
             rowDelta = -1,
         )
 
-    internal fun lowerRightDiagonal(
+    internal fun lowerRightDiagonalValidToCoordinates(
         board: Board,
         initialCoordinates: Coordinates,
     ): Collection<Coordinates> =
-        findPossibleMoveCoordinates(
+        findValidToCoordinates(
             board = board,
             initialCoordinates = initialCoordinates,
             colDelta = 1,
             rowDelta = 1,
         )
 
-    internal fun lowerLeftDiagonal(
+    internal fun lowerLeftDiagonalValidToCoordinates(
         board: Board,
         initialCoordinates: Coordinates,
     ): Collection<Coordinates> =
-        findPossibleMoveCoordinates(
+        findValidToCoordinates(
             board = board,
             initialCoordinates = initialCoordinates,
             colDelta = -1,
@@ -554,7 +554,7 @@ sealed class Piece {
 
     // Find possible moves, in a given direction, for pieces that can't jump over other pieces. I.e. not Knights.
     // The direction to explore is defined by the [colDelta] and [rowDelta] values.
-    private fun findPossibleMoveCoordinates(
+    private fun findValidToCoordinates(
         board: Board,
         initialCoordinates: Coordinates,
         colDelta: Int,

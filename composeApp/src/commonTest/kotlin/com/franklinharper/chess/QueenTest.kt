@@ -164,7 +164,8 @@ class QueenTest {
         // attacking piece
         val queenCoordinates = Coordinates(col = 0, row = 1)
         val board = Board(
-            setOf(
+            moveColor = Black,
+            squares = setOf(
                 // White
                 Square(piece = King(White), coordinates = Coordinates(col = 0, row = 0)),
                 // The Queen is pinned to the King
@@ -180,7 +181,6 @@ class QueenTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = queenCoordinates,
-                checkForStalemate = false
             )
         )
     }
@@ -188,7 +188,8 @@ class QueenTest {
     @Test
     fun testCaptureRemovesCheckOnKing() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // White
                 Square(piece = King(White), coordinates = Coordinates(col = 0, row = 0)),
                 Square(piece = Queen(White), coordinates = Coordinates(col = 1, row = 1)),
@@ -207,7 +208,6 @@ class QueenTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 1, row = 1),
-                checkForStalemate = false
             )
         )
     }
@@ -237,7 +237,6 @@ class QueenTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 0, row = 1),
-                checkForStalemate = false
             )
         )
     }

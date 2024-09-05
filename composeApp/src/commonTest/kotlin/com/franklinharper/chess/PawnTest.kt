@@ -12,7 +12,8 @@ class PawnTest {
     @Test
     fun testNormalAndTwoSquareAdvanceMoves() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // White
                 Square(piece = King(White), coordinates = whiteKingInitialCoordinates),
                 Square(
@@ -37,7 +38,6 @@ class PawnTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 4, row = 6),
-                checkForStalemate = false
             ),
         )
         assertEquals(
@@ -49,7 +49,6 @@ class PawnTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 4, row = 1),
-                checkForStalemate = false
             ),
         )
     }
@@ -57,7 +56,8 @@ class PawnTest {
     @Test
     fun testTwoSquareAdvanceOnPreviousMoveFlag() {
         val boardAfterTwoSquareAdvance = Board(
-            setOf(
+            moveColor = Black,
+            squares = setOf(
                 // Black
                 Square(piece = King(Black), coordinates = blackKingInitialCoordinates),
                 Square(
@@ -91,7 +91,8 @@ class PawnTest {
         @Test
     fun testTwoSquareAdvanceMovesAreNotPossibleWhenPawnHasMoved() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // White
                 Square(piece = King(White), coordinates = whiteKingInitialCoordinates),
                 Square(
@@ -115,7 +116,6 @@ class PawnTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 4, row = 5),
-                checkForStalemate = false
             ),
         )
         assertEquals(
@@ -126,7 +126,6 @@ class PawnTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 4, row = 2),
-                checkForStalemate = false
             ),
         )
     }
@@ -134,7 +133,8 @@ class PawnTest {
     @Test
     fun testFriendlyPiecesBlockNormalAndTwoSquareAdvanceMoves() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // White
                 Square(piece = King(White), coordinates = whiteKingInitialCoordinates),
                 Square(
@@ -164,7 +164,6 @@ class PawnTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 4, row = 6),
-                checkForStalemate = false
             ),
         )
         assertEquals(
@@ -173,7 +172,6 @@ class PawnTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 4, row = 1),
-                checkForStalemate = false
             ),
         )
     }
@@ -181,6 +179,8 @@ class PawnTest {
     @Test
     fun testFriendlyPiecesBlockTwoSquareAdvanceMoves() {
         val board = Board(
+            moveColor = White,
+            squares =
             setOf(
                 // White
                 Square(piece = King(White), coordinates = whiteKingInitialCoordinates),
@@ -211,7 +211,6 @@ class PawnTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 4, row = 6),
-                checkForStalemate = false
             ),
         )
         assertEquals(
@@ -220,7 +219,6 @@ class PawnTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 4, row = 1),
-                checkForStalemate = false
             ),
         )
     }
@@ -228,7 +226,8 @@ class PawnTest {
     @Test
     fun testEnemyPiecesBlockNormalAndTwoSquareAdvanceMoves() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // White
                 Square(piece = King(White), coordinates = whiteKingInitialCoordinates),
                 Square(
@@ -258,7 +257,6 @@ class PawnTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 4, row = 6),
-                checkForStalemate = false
             ),
         )
         assertEquals(
@@ -267,7 +265,6 @@ class PawnTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 4, row = 1),
-                checkForStalemate = false
             ),
         )
     }
@@ -275,7 +272,8 @@ class PawnTest {
     @Test
     fun testBlackPawnCaptureMoves() {
         val board = Board(
-            setOf(
+            moveColor = Black,
+            squares = setOf(
                 // Black
                 Square(piece = King(Black), coordinates = blackKingInitialCoordinates),
                 Square(
@@ -309,7 +307,6 @@ class PawnTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 4, row = 1),
-                checkForStalemate = false
             ),
         )
     }
@@ -317,7 +314,8 @@ class PawnTest {
     @Test
     fun testWhitePawnCaptureMoves() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // White
                 Square(piece = King(White), coordinates = whiteKingInitialCoordinates),
                 Square(
@@ -350,7 +348,6 @@ class PawnTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 4, row = 6),
-                checkForStalemate = false
             ),
         )
     }
@@ -358,7 +355,8 @@ class PawnTest {
     @Test
     fun testPawnCantMoveBecauseKingIsInCheck() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // Black
                 Square(piece = King(Black), coordinates = blackKingInitialCoordinates),
                 Square(
@@ -378,7 +376,6 @@ class PawnTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 0, row = 1),
-                checkForStalemate = false
             ),
         )
     }
@@ -386,7 +383,8 @@ class PawnTest {
     @Test
     fun testPawnCantItIsPinned() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // Black
                 Square(piece = King(Black), coordinates = blackKingInitialCoordinates),
                 Square(
@@ -406,7 +404,6 @@ class PawnTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 3, row = 1),
-                checkForStalemate = false
             ),
         )
     }
@@ -414,7 +411,8 @@ class PawnTest {
     @Test
     fun testCaptureRemovesCheckOnKing() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // Black
                 Square(piece = King(Black), coordinates = blackKingInitialCoordinates),
                 Square(
@@ -434,7 +432,6 @@ class PawnTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 3, row = 1),
-                checkForStalemate = false
             ),
         )
     }
@@ -442,7 +439,8 @@ class PawnTest {
     @Test
     fun testPawnBlocksCheck() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // Black
                 Square(piece = King(Black), coordinates = Coordinates(col = 4, row = 1)),
                 Square(
@@ -462,7 +460,6 @@ class PawnTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 3, row = 1),
-                checkForStalemate = false
             ),
         )
     }
@@ -470,7 +467,8 @@ class PawnTest {
     @Test
     fun testWhiteEnPassantCapture() {
         val initialBoard = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // Black
                 Square(piece = King(Black), coordinates = blackKingInitialCoordinates),
                 Square(
@@ -506,7 +504,6 @@ class PawnTest {
             actual = findValidMoves(
                 board = enPassantLeftPossibleBoard,
                 coordinates = Coordinates(col = 5, row = 3),
-                checkForStalemate = false
             ),
         )
         val afterEnPassantLeftBoard = enPassantLeftPossibleBoard
@@ -542,7 +539,6 @@ class PawnTest {
             actual = findValidMoves(
                 board = enPassantRightPossibleBoard,
                 coordinates = Coordinates(col = 5, row = 3),
-                checkForStalemate = false
             ),
         )
         val afterEnPassantRightBoard = enPassantRightPossibleBoard
@@ -569,7 +565,8 @@ class PawnTest {
     @Test
     fun testBlackEnPassantCapture() {
         val initialBoard = Board(
-            setOf(
+            moveColor = Black,
+            squares = setOf(
                 // Black
                 Square(piece = King(Black), coordinates = blackKingInitialCoordinates),
                 Square(
@@ -606,7 +603,6 @@ class PawnTest {
             actual = findValidMoves(
                 board = enPassantLeftPossibleBoard,
                 coordinates = Coordinates(col = 5, row = 4),
-                checkForStalemate = false
             ),
         )
         val afterEnPassantLeftBoard = enPassantLeftPossibleBoard
@@ -643,7 +639,6 @@ class PawnTest {
             actual = findValidMoves(
                 board = enPassantRightPossibleBoard,
                 coordinates = Coordinates(col = 5, row = 4),
-                checkForStalemate = false
             ),
         )
         val afterEnPassantRightBoard = enPassantRightPossibleBoard
@@ -670,7 +665,8 @@ class PawnTest {
     @Test
     fun testEnPassantIsNotPossibleBecauseNoTwoSquareAdvanceOnPreviousMove() {
         val initialBoard = Board(
-            setOf(
+            moveColor = Black,
+            squares = setOf(
                 // Black
                 Square(piece = King(Black), coordinates = blackKingInitialCoordinates),
                 Square(
@@ -704,7 +700,6 @@ class PawnTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 5, row = 4),
-                checkForStalemate = false
             ),
         )
     }

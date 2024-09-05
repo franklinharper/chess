@@ -25,6 +25,8 @@ class KingTest {
     @Test
     fun testAllNormalMovesArePossible() {
         val board = Board(
+            moveColor = White,
+            squares =
             setOf(
                 Square(
                     piece = King(Black, hasMoved = true),
@@ -46,7 +48,6 @@ class KingTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 1, row = 2),
-                checkForStalemate = false
             )
         )
     }
@@ -54,7 +55,8 @@ class KingTest {
     @Test
     fun testFriendlyPiecesBlockMoves() {
         val board = Board(
-            setOf(
+            moveColor = Black,
+            squares = setOf(
                 Square(
                     piece = King(Black, hasMoved = true),
                     coordinates = Coordinates(col = 1, row = 1)
@@ -81,7 +83,6 @@ class KingTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 1, row = 1),
-                checkForStalemate = false
             )
         )
     }
@@ -89,7 +90,8 @@ class KingTest {
     @Test
     fun testEdgesBlockMoves() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 Square(
                     piece = King(White, hasMoved = true),
                     coordinates = Coordinates(col = 0, row = 0)
@@ -105,7 +107,6 @@ class KingTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 0, row = 0),
-                checkForStalemate = false
             )
         )
     }
@@ -113,6 +114,8 @@ class KingTest {
     @Test
     fun testSquaresThatCanBeAttackedArentValidMoves() {
         val board = Board(
+            moveColor = White,
+            squares =
             setOf(
                 Square(
                     piece = King(White, hasMoved = true),
@@ -129,7 +132,6 @@ class KingTest {
             actual = findValidMoves(
                 board = board,
                 coordinates = Coordinates(col = 0, row = 0),
-                checkForStalemate = false
             )
         )
     }
@@ -137,7 +139,8 @@ class KingTest {
     @Test
     fun testCastlingIsPossible() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // White
                 Square(
                     piece = Rook(White, hasMoved = false),
@@ -170,9 +173,8 @@ class KingTest {
         val whiteActual = findValidMoves(
             board = board,
             coordinates = whiteKingInitialCoordinates,
-            checkForStalemate = false
         )
-        assertContains(whiteActual, Piece.whiteQueensideCastle)
+        assertContains(whiteActual, whiteQueensideCastle)
         assertContains(whiteActual, whiteKingsideCastle)
 
         // Validate the board state after white kingside castling
@@ -206,7 +208,6 @@ class KingTest {
         val blackActual = findValidMoves(
             board = board,
             coordinates = blackKingInitialCoordinates,
-            checkForStalemate = false
         )
         assertContains(blackActual, blackQueensideCastle)
         assertContains(blackActual, blackKingsideCastle)
@@ -241,7 +242,8 @@ class KingTest {
     @Test
     fun testCastlingIsNotPossibleWhenKingHasMoved() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // White
                 Square(
                     piece = King(hasMoved = true, color = White),
@@ -262,24 +264,23 @@ class KingTest {
         val whiteActual = findValidMoves(
             board = board,
             coordinates = whiteKingInitialCoordinates,
-            checkForStalemate = false
         )
-        assertFalse(whiteActual.contains(Piece.whiteQueensideCastle))
+        assertFalse(whiteActual.contains(whiteQueensideCastle))
         assertFalse(whiteActual.contains(whiteKingsideCastle))
 
         val blackActual = findValidMoves(
             board = board,
             coordinates = blackKingInitialCoordinates,
-            checkForStalemate = false
         )
-        assertFalse(blackActual.contains(Piece.whiteQueensideCastle))
+        assertFalse(blackActual.contains(whiteQueensideCastle))
         assertFalse(blackActual.contains(whiteKingsideCastle))
     }
 
     @Test
     fun testCastlingIsNotPossibleWhenRookHasMoved() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // White
                 Square(piece = King(White), coordinates = whiteKingInitialCoordinates),
                 Square(piece = Rook(White), coordinates = whiteQueensideRookInitialCoordinates),
@@ -301,28 +302,27 @@ class KingTest {
         val whiteActual = findValidMoves(
             board = board,
             coordinates = whiteKingInitialCoordinates,
-            checkForStalemate = false
         )
         // Queenside castling IS possible
-        assertContains(whiteActual, Piece.whiteQueensideCastle)
+        assertContains(whiteActual, whiteQueensideCastle)
         // Kingside castling is NOT possible
         assertFalse(whiteActual.contains(whiteKingsideCastle))
 
         val blackActual = findValidMoves(
             board = board,
             coordinates = blackKingInitialCoordinates,
-            checkForStalemate = false
         )
         // Queenside castling IS possible
-        assertContains(blackActual, Piece.blackQueensideCastle)
+        assertContains(blackActual, blackQueensideCastle)
         // Kingside castling is NOT possible
-        assertFalse(blackActual.contains(Piece.blackKingsideCastle))
+        assertFalse(blackActual.contains(blackKingsideCastle))
     }
 
     @Test
     fun testCastlingIsNotPossibleWhenKingIsInCheck() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 // White King and rooks that haven't moved
                 Square(piece = King(White), coordinates = whiteKingInitialCoordinates),
                 Square(piece = Rook(White), coordinates = whiteQueensideRookInitialCoordinates),
@@ -345,24 +345,23 @@ class KingTest {
         val whiteActual = findValidMoves(
             board = board,
             coordinates = whiteKingInitialCoordinates,
-            checkForStalemate = false
         )
-        assertFalse(whiteActual.contains(Piece.whiteQueensideCastle))
+        assertFalse(whiteActual.contains(whiteQueensideCastle))
         assertFalse(whiteActual.contains(whiteKingsideCastle))
 
         val blackActual = findValidMoves(
             board = board,
             coordinates = blackKingInitialCoordinates,
-            checkForStalemate = false
         )
-        assertFalse(blackActual.contains(Piece.blackQueensideCastle))
-        assertFalse(blackActual.contains(Piece.blackKingsideCastle))
+        assertFalse(blackActual.contains(blackQueensideCastle))
+        assertFalse(blackActual.contains(blackKingsideCastle))
     }
 
     @Test
     fun testWhiteCastlingIsNotPossibleWhenAnIntermediateSquareIsOccupied() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 Square(piece = Rook(White), coordinates = whiteQueensideRookInitialCoordinates),
                 Square(piece = Knight(White), coordinates = Coordinates(col = 1, row = 7)),
                 Square(piece = King(White), coordinates = whiteKingInitialCoordinates),
@@ -373,16 +372,16 @@ class KingTest {
         val actual = findValidMoves(
             board = board,
             coordinates = whiteKingInitialCoordinates,
-            checkForStalemate = false
         )
-        assertFalse(actual.contains(Piece.whiteQueensideCastle))
+        assertFalse(actual.contains(whiteQueensideCastle))
         assertFalse(actual.contains(whiteKingsideCastle))
     }
 
     @Test
     fun testBlackCastlingIsNotPossibleWhenAnIntermediateSquareIsOccupied() {
         val board = Board(
-            setOf(
+            moveColor = Black,
+            squares = setOf(
                 // Black
                 Square(piece = Rook(Black), coordinates = blackQueensideRookInitialCoordinates),
                 Square(piece = Knight(Black), coordinates = Coordinates(col = 1, row = 0)),
@@ -394,16 +393,16 @@ class KingTest {
         val actual = findValidMoves(
             board = board,
             coordinates = blackKingInitialCoordinates,
-            checkForStalemate = false
         )
-        assertFalse(actual.contains(Piece.blackQueensideCastle))
-        assertFalse(actual.contains(Piece.blackKingsideCastle))
+        assertFalse(actual.contains(blackQueensideCastle))
+        assertFalse(actual.contains(blackKingsideCastle))
     }
 
     @Test
     fun testWhiteCastlingIsNotPossibleWhenAnIntermediateSquareIsOccupied2() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 Square(piece = Rook(White), coordinates = whiteQueensideRookInitialCoordinates),
                 Square(piece = Bishop(White), coordinates = Coordinates(col = 2, row = 7)),
                 Square(piece = King(White), coordinates = whiteKingInitialCoordinates),
@@ -414,10 +413,9 @@ class KingTest {
         val actual = findValidMoves(
             board = board,
             coordinates = whiteKingInitialCoordinates,
-            checkForStalemate = false
         )
         // Queenside castling is not possible
-        assertFalse(actual.contains(Piece.whiteQueensideCastle))
+        assertFalse(actual.contains(whiteQueensideCastle))
         // Kingside castling is not possible
         assertFalse(actual.contains(whiteKingsideCastle))
     }
@@ -425,7 +423,8 @@ class KingTest {
     @Test
     fun testBlackCastlingIsNotPossibleWhenAnIntermediateSquareIsOccupied2() {
         val board = Board(
-            setOf(
+            moveColor = Black,
+            squares = setOf(
                 // Black
                 Square(piece = Rook(Black), coordinates = blackQueensideRookInitialCoordinates),
                 Square(piece = Bishop(Black), coordinates = Coordinates(col = 2, row = 0)),
@@ -439,18 +438,18 @@ class KingTest {
         val actual = findValidMoves(
             board = board,
             coordinates = blackKingInitialCoordinates,
-            checkForStalemate = false
         )
         // Queenside castling is not possible
-        assertFalse(actual.contains(Piece.blackQueensideCastle))
+        assertFalse(actual.contains(blackQueensideCastle))
         // Kingside castling is not possible
-        assertFalse(actual.contains(Piece.blackKingsideCastle))
+        assertFalse(actual.contains(blackKingsideCastle))
     }
 
     @Test
     fun testWhiteQueensideCastlingIsNotPossibleWhenQueenIsInItsInitialPosition() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 Square(piece = Rook(White), coordinates = whiteQueensideRookInitialCoordinates),
                 Square(piece = Queen(White), coordinates = Piece.whiteQueenInitialCoordinates),
                 Square(piece = King(White), coordinates = whiteKingInitialCoordinates),
@@ -460,10 +459,9 @@ class KingTest {
         val actual = findValidMoves(
             board = board,
             coordinates = whiteKingInitialCoordinates,
-            checkForStalemate = false
         )
         // Queenside castling is not possible
-        assertFalse(actual.contains(Piece.whiteQueensideCastle))
+        assertFalse(actual.contains(whiteQueensideCastle))
         // Kingside castling is possible
         assertContains(actual, whiteKingsideCastle)
     }
@@ -471,7 +469,8 @@ class KingTest {
     @Test
     fun testBlackQueensideCastlingIsNotPossibleWhenQueenIsInItsInitialPosition() {
         val board = Board(
-            setOf(
+            moveColor = Black,
+            squares = setOf(
                 Square(piece = Rook(Black), coordinates = blackQueensideRookInitialCoordinates),
                 Square(piece = Queen(Black), coordinates = Piece.blackQueenInitialCoordinates),
                 Square(piece = King(Black), coordinates = blackKingInitialCoordinates),
@@ -481,17 +480,18 @@ class KingTest {
         val actual = findValidMoves(
             board = board,
             coordinates = blackKingInitialCoordinates,
-            checkForStalemate = false
         )
         // Queenside castling is not possible
-        assertFalse(actual.contains(Piece.blackQueensideCastle))
+        assertFalse(actual.contains(blackQueensideCastle))
         // Kingside castling is possible
-        assertContains(actual, Piece.blackKingsideCastle)
+        assertContains(actual, blackKingsideCastle)
     }
 
     @Test
-    fun testCastlingIsNotPossibleWhenEnemypieceIsOnAnIntermediateSquare() {
+    fun testCastlingIsNotPossibleWhenEnemyPieceIsOnAnIntermediateSquare() {
         val board = Board(
+            moveColor = White,
+            squares =
             setOf(
                 Square(piece = King(White), coordinates = whiteKingInitialCoordinates),
                 Square(piece = Rook(Black), coordinates = Coordinates(col = 6, row = 7)),
@@ -501,10 +501,9 @@ class KingTest {
         val actual = findValidMoves(
             board = board,
             coordinates = whiteKingInitialCoordinates,
-            checkForStalemate = false
         )
         // Queenside castling is NOT possible
-        assertFalse(actual.contains(Piece.whiteQueensideCastle))
+        assertFalse(actual.contains(whiteQueensideCastle))
         // Kingside castling is NOT possible
         assertFalse(actual.contains(whiteKingsideCastle))
     }
@@ -512,7 +511,8 @@ class KingTest {
     @Test
     fun testCastlingIsNotPossibleWhenAnIntermediateSquareIsUnderAttack() {
         val board = Board(
-            setOf(
+            moveColor = White,
+            squares = setOf(
                 Square(piece = Rook(White), coordinates = whiteKingsideRookInitialCoordinates),
                 Square(piece = King(White), coordinates = whiteKingInitialCoordinates),
                 Square(piece = Rook(White), coordinates = whiteKingsideRookInitialCoordinates),
@@ -523,10 +523,9 @@ class KingTest {
         val actual = findValidMoves(
             board = board,
             coordinates = whiteKingInitialCoordinates,
-            checkForStalemate = false
         )
         // Queenside castling is NOT possible
-        assertFalse(actual.contains(Piece.whiteQueensideCastle))
+        assertFalse(actual.contains(whiteQueensideCastle))
         // Kingside castling is NOT possible
         assertFalse(actual.contains(whiteKingsideCastle))
     }
@@ -534,6 +533,7 @@ class KingTest {
     @Test
     fun testCheckmate() {
         val board = Board(
+            moveColor = White,
             squares = setOf(
                 // Black
                 Square(
@@ -558,6 +558,7 @@ class KingTest {
     @Test
     fun testCheckmateWithPinnedRook() {
         val board = Board(
+            moveColor = White,
             squares = setOf(
                 // White
                 Square(
@@ -590,6 +591,7 @@ class KingTest {
     @Test
     fun testCheckmate2() {
         val board = Board(
+            moveColor = White,
             squares = setOf(
                 // Black
                 Square(
@@ -618,6 +620,7 @@ class KingTest {
     @Test
     fun testStalemate() {
         val board = Board(
+            moveColor = White,
             squares = setOf(
                 // Black
                 Square(
@@ -642,6 +645,7 @@ class KingTest {
     @Test
     fun testPinnedPieceStalemate() {
         val board = Board(
+            moveColor = White,
             squares = setOf(
                 // Black
                 Square(
