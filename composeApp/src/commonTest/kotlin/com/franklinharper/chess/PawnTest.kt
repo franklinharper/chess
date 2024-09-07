@@ -88,7 +88,7 @@ class PawnTest {
         )
     }
 
-        @Test
+    @Test
     fun testTwoSquareAdvanceMovesAreNotPossibleWhenPawnHasMoved() {
         val board = Board(
             moveColor = White,
@@ -701,6 +701,29 @@ class PawnTest {
                 board = board,
                 coordinates = Coordinates(col = 5, row = 4),
             ),
+        )
+    }
+
+    @Test
+
+    fun testPromotion() {
+        val board = Board(
+            moveColor = White,
+            squares = Board.endGameSetupForTesting,
+        )
+            // Move white pawn to promotion square.
+            .move(from = Coordinates(col = 7, row = 1), to = Coordinates(col = 7, row = 0))
+
+        assertEquals(
+            expected = Pawn(White, hasMoved = true, isWaitingForPromotion = true),
+            actual = board.getPieceOrNull(Coordinates(col = 7, row = 0)),
+        )
+        assertEquals(
+            expected = Square(
+                piece = Pawn(White, hasMoved = true, isWaitingForPromotion = true),
+                coordinates = Coordinates(col = 7, row = 0)
+            ),
+            actual = board.findPromotionSquare(),
         )
     }
 }

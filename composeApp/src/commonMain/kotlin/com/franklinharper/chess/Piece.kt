@@ -319,6 +319,7 @@ sealed class Piece {
         override val color: PieceColor,
         override val hasMoved: Boolean = false,
         val twoSquareAdvanceOnPreviousMove: Boolean = false,
+        val isWaitingForPromotion: Boolean = false,
     ) : Piece() {
 
         override fun findValidToCoordinates(

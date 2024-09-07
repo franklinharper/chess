@@ -5,7 +5,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class ViewModel {
-    fun onSquareClick(colIndex: Int, rowIndex: Int) {
+    fun onSquareClick(
+        colIndex: Int,
+        rowIndex: Int,
+    ) {
         println("clicked: col: $colIndex, row: $rowIndex")
         val newBoard = _state.value.clickSquare(
             colIndex = colIndex,
@@ -25,8 +28,20 @@ class ViewModel {
         )
     }
 
+    fun onPromotionClick(piece: Piece, square: Square) {
+        val newBoard = _state.value.promotePawn(
+            piece = piece,
+            square = square,
+        )
+        _state.value = newBoard
+    }
+
     private val _state = MutableStateFlow(Board())
     val state: StateFlow<Board> = _state
+}
+
+private fun Board.promotePawn(piece: Piece, square: Square): Board {
+    return this.replacePiece(newPiece = piece, square = square)
 }
 
 fun createViewModel(): ViewModel = ViewModel()

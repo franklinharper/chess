@@ -48,7 +48,7 @@ data class Board(
 
         return when {
             // Move piece
-            square.isValidMove -> {
+            square.isValidMoveDestination -> {
                 val fromSquare = getSelectedSquare()!!
                 copyAndDeselectAllSquares()
                     .copyAndUpdateValidMoves(emptySet())
@@ -131,10 +131,10 @@ data class Board(
         }
         val movedPiece = when (fromPiece) {
             is Pawn -> {
-                val twoSquareAdvance = abs(to.row - from.row) == 2
                 fromPiece.copy(
                     hasMoved = true,
-                    twoSquareAdvanceOnPreviousMove = twoSquareAdvance
+                    twoSquareAdvanceOnPreviousMove = abs(to.row - from.row) == 2,
+                    isWaitingForPromotion = to.row == 0 || to.row == 7,
                 )
             }
 
@@ -209,12 +209,12 @@ data class Board(
     private fun copyAndUpdateValidMoves(validMoves: Set<Coordinates>): Board {
         val mutableMap = squareMap.toMutableMap()
         for (square in squareMap.values) {
-            if (square.isValidMove) mutableMap[square.coordinates] =
-                square.copy(isValidMove = false)
+            if (square.isValidMoveDestination) mutableMap[square.coordinates] =
+                square.copy(isValidMoveDestination = false)
 
         }
         for (coordinates in validMoves) {
-            mutableMap[coordinates] = getSquare(coordinates).copy(isValidMove = true)
+            mutableMap[coordinates] = getSquare(coordinates).copy(isValidMoveDestination = true)
         }
         return Board(
             squareMap = mutableMap,
@@ -252,6 +252,18 @@ data class Board(
         // The board status is not recalculated; which is a bug.
         // TODO fix the bug by removing the boardSatus property from Board
         return Board(squareMap = mutableMap, moveColor = moveColor)
+    }
+
+    fun findPromotionSquare(): Square? {
+        return squareMap
+            .values
+            .find { square -> square.piece is Pawn && square.piece.isWaitingForPromotion }
+    }
+
+    fun replacePiece(newPiece: Piece, square: Square): Board {
+        val mutableMap = squareMap.toMutableMap()
+        mutableMap[square.coordinates] = square.copy(piece = newPiece)
+        return copy(squareMap = mutableMap)
     }
 
     companion object {

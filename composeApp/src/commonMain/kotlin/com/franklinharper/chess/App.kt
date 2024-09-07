@@ -4,21 +4,31 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Arrangement.Absolute.SpaceEvenly
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.Button
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,7 +48,10 @@ import chess.composeapp.generated.resources.white_knight
 import chess.composeapp.generated.resources.white_pawn
 import chess.composeapp.generated.resources.white_queen
 import chess.composeapp.generated.resources.white_rook
+import com.franklinharper.chess.Piece.*
 import com.franklinharper.chess.PieceColor.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -167,7 +180,7 @@ private fun ChessBoard(
                                 contentDescription = null
                             )
                         }
-                        if (square.isValidMove) {
+                        if (square.isValidMoveDestination) {
                             Image(
                                 painter = painterResource(Res.drawable.possible_move),
                                 contentDescription = null
@@ -178,17 +191,83 @@ private fun ChessBoard(
                 }
             }
         }
+        val promotionSquare = board.findPromotionSquare()
+        if (promotionSquare != null) {
+            PromotionDialog(promotionSquare) { piece, square ->
+                viewModel.onPromotionClick(piece, square)
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun PromotionDialog(
+    promotionSquare: Square,
+    onPromotionClick: (Piece, Square) -> Unit,
+) {
+    val modalBottomSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden
+    )
+
+    val coroutineScope = rememberCoroutineScope()
+
+    coroutineScope.launch { modalBottomSheetState.show() }
+
+    val pieceColor = promotionSquare.piece!!.color
+
+    ModalBottomSheetLayout(
+        sheetState = modalBottomSheetState,
+        sheetContent = {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Row(horizontalArrangement = SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
+                    PieceButton(Queen(pieceColor), promotionSquare, onPromotionClick, coroutineScope, modalBottomSheetState)
+                    PieceButton(Knight(pieceColor), promotionSquare, onPromotionClick, coroutineScope, modalBottomSheetState)
+                }
+                Spacer(Modifier.size(16.dp))
+                Row(horizontalArrangement = SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
+                    PieceButton(Rook(pieceColor), promotionSquare, onPromotionClick, coroutineScope, modalBottomSheetState)
+                    PieceButton(Bishop(pieceColor), promotionSquare, onPromotionClick, coroutineScope, modalBottomSheetState)
+                }
+            }
+        }
+    )
+    {
+        // Nothing is displayed when this sheet is hidden.
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun PieceButton(
+    piece: Piece,
+    square: Square,
+    onPromotionClick: (Piece, Square) -> Unit,
+    coroutineScope: CoroutineScope,
+    modalBottomSheetState: ModalBottomSheetState,
+) {
+    Button(
+        onClick = {
+            coroutineScope.launch { modalBottomSheetState.hide() }
+            onPromotionClick(piece, square)
+        }
+    ) {
+        Image(
+            painter = painterResource(piece.image),
+            contentDescription = null
+        )
     }
 }
 
 private val Piece.image: DrawableResource
     get() {
         return when (this) {
-            is Piece.Bishop -> if (color == White) Res.drawable.white_bishop else Res.drawable.black_bishop
-            is Piece.King -> if (color == White) Res.drawable.white_king else Res.drawable.black_king
-            is Piece.Knight -> if (color == White) Res.drawable.white_knight else Res.drawable.black_knight
-            is Piece.Pawn -> if (color == White) Res.drawable.white_pawn else Res.drawable.black_pawn
-            is Piece.Queen -> if (color == White) Res.drawable.white_queen else Res.drawable.black_queen
-            is Piece.Rook -> if (color == White) Res.drawable.white_rook else Res.drawable.black_rook
+            is Bishop -> if (color == White) Res.drawable.white_bishop else Res.drawable.black_bishop
+            is King -> if (color == White) Res.drawable.white_king else Res.drawable.black_king
+            is Knight -> if (color == White) Res.drawable.white_knight else Res.drawable.black_knight
+            is Pawn -> if (color == White) Res.drawable.white_pawn else Res.drawable.black_pawn
+            is Queen -> if (color == White) Res.drawable.white_queen else Res.drawable.black_queen
+            is Rook -> if (color == White) Res.drawable.white_rook else Res.drawable.black_rook
         }
     }
