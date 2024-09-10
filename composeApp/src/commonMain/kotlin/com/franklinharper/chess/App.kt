@@ -114,20 +114,8 @@ fun App() {
                 )
             }
         ) {
-            ChessBoard(state, viewModel)
+            ChessBoard(state.board, viewModel)
         }
-
-//            AnimatedVisibility(showContent) {
-//                val greeting = remember { Greeting().greet() }
-//                Column(
-//                    Modifier.fillMaxWidth(),
-//                    horizontalAlignment = Alignment.CenterHorizontally
-//                ) {
-//                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-//                    Text("Compose: $greeting")
-//                }
-//            }
-//        }
     }
 }
 
@@ -137,7 +125,7 @@ val lightSquareBackground = Color.LightGray
 @Composable
 private fun ChessBoard(
     board: Board,
-    viewModel: ViewModel,
+    viewModel: ViewController,
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),

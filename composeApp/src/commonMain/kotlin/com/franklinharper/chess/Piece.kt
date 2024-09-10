@@ -197,10 +197,10 @@ sealed class Piece {
             // to a new square.
             val boardWithoutKing = board.removePiece(from = fromCoordinates)
 
-            val normalMoves = Board.neighborOffsets.mapNotNull {
+            val normalMoves = Board.neighborOffsets.mapNotNull { offset ->
                 val offsetCoordinates = Coordinates(
-                    col = fromCoordinates.col + it.first,
-                    row = fromCoordinates.row + it.second,
+                    col = fromCoordinates.col + offset.colDelta,
+                    row = fromCoordinates.row + offset.rowDelta,
                 )
                 board.getSquareOrNull(offsetCoordinates)
             }.filter { toSquare ->

@@ -4,44 +4,54 @@ import com.franklinharper.chess.Board.Companion.endGameSetupForTesting
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class ViewModel {
+data class GameState(
+    val board: Board = Board(),
+    val autoPlay: Boolean = false,
+)
+
+class ViewController {
+
+    private val _state = MutableStateFlow(GameState())
+    val state: StateFlow<GameState> = _state
+
     fun onSquareClick(
         colIndex: Int,
         rowIndex: Int,
     ) {
         println("clicked: col: $colIndex, row: $rowIndex")
-        val newBoard = _state.value.clickSquare(
+        val gameState = _state.value
+        val newBoard = gameState.board.clickSquare(
             colIndex = colIndex,
             rowIndex = rowIndex,
         )
-        _state.value = newBoard
+        _state.value = gameState.copy(board = newBoard)
     }
 
     fun onNewGameClick() {
-        _state.value = Board()
+        _state.value = GameState()
     }
 
     fun onSetEndGamePositionClick() {
-        _state.value = Board(
-            squares = endGameSetupForTesting,
-            moveColor = PieceColor.White,
+        _state.value = GameState(
+            board = Board(
+                squares = endGameSetupForTesting,
+                moveColor = PieceColor.White,
+            )
         )
     }
 
     fun onPromotionClick(piece: Piece, square: Square) {
-        val newBoard = _state.value.promotePawn(
+        val gameState = _state.value
+        val newBoard = gameState.board.promotePawn(
             piece = piece,
             square = square,
         )
-        _state.value = newBoard
+        _state.value = gameState.copy(board = newBoard)
     }
-
-    private val _state = MutableStateFlow(Board())
-    val state: StateFlow<Board> = _state
 }
 
 private fun Board.promotePawn(piece: Piece, square: Square): Board {
     return this.replacePiece(newPiece = piece, square = square)
 }
 
-fun createViewModel(): ViewModel = ViewModel()
+fun createViewModel(): ViewController = ViewController()

@@ -341,13 +341,18 @@ data class Board(
         val neighborOffsets = setOf(
             // Offsets are Pair(col, row)
             // Row above
-            Pair(-1, -1), Pair(0, -1), Pair(1, -1),
+            Offset(colDelta = -1, rowDelta = -1),
+            Offset(colDelta = 0, rowDelta = -1),
+            Offset(colDelta = 1, rowDelta = -1),
 
             // Same row
-            Pair(-1, 0), Pair(1, 0),
+            Offset(colDelta = -1, rowDelta = 0),
+            Offset(colDelta = 1, rowDelta = 0),
 
             // Row below
-            Pair(-1, 1), Pair(0, 1), Pair(1, 1),
+            Offset(colDelta = -1, rowDelta = 1),
+            Offset(colDelta = 0, rowDelta = 1),
+            Offset(colDelta = 1, rowDelta = 1),
         )
     }
 }
@@ -520,23 +525,21 @@ private fun findFirstPiece(
 }
 
 private val knightOffsets = setOf(
-    // Offsets are Pair(col, row)
-
     // Above
-    Pair(-1, -2),
-    Pair(1, -2),
+    Offset(colDelta = -1, rowDelta = -2),
+    Offset(colDelta = 1, rowDelta = -2),
 
     //Left
-    Pair(-2, 1),
-    Pair(-2, -1),
+    Offset(colDelta = -2, rowDelta = 1),
+    Offset(colDelta = -2, rowDelta = -1),
 
     // Right
-    Pair(2, 1),
-    Pair(2, -1),
+    Offset(colDelta = 2, rowDelta = 1),
+    Offset(colDelta = 2, rowDelta = -1),
 
     // Below
-    Pair(-1, 2),
-    Pair(1, 2),
+    Offset(colDelta = -1, rowDelta = 2),
+    Offset(colDelta = 1, rowDelta = 2),
 )
 
 // Check for attacks from enemy Knights
@@ -555,21 +558,25 @@ private fun findPieceByOffsets(
     board: Board,
     originCoordinates: Coordinates,
     piece: Piece,
-    offsets: Set<Pair<Int, Int>>,
+    offsets: Set<Offset>,
 ): Boolean {
     return offsets.any { offset ->
-        val col = originCoordinates.col + offset.first
-        val row = originCoordinates.row + offset.second
+        val col = originCoordinates.col + offset.colDelta
+        val row = originCoordinates.row + offset.rowDelta
         val otherPiece = board.getPieceOrNull(Coordinates(col = col, row = row))
         piece.isSameColorAndTypeAs(otherPiece)
     }
 }
 
-// Check for attacks from enemy Pawns
-//
-// Offsets are Pair(col, row)
-private val whitePawnOffsets = setOf(Pair(-1, 1), Pair(1, 1))
-private val blackPawnOffsets = setOf(Pair(1, -1), Pair(-1, -1))
+private val whitePawnOffsets = setOf(
+    Offset(colDelta = -1, rowDelta = 1),
+    Offset(colDelta = 1, rowDelta = 1)
+)
+
+private val blackPawnOffsets = setOf(
+    Offset(colDelta = 1, rowDelta = -1),
+    Offset(colDelta = -1, rowDelta = -1)
+)
 
 // Pawns can only attack forwards diagonally.
 private fun isUnderPawnAttack(
